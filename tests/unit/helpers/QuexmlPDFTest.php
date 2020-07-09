@@ -12,6 +12,12 @@ class QuexmlPDFTest extends TestBaseClass
      */
     public static function setUpBeforeClass()
     {
+        global $dom, $quexmllang, $iSurveyID;
+
+        $dom = null;
+        $quexmllang = null;
+        $iSurveyID = null;
+
         parent::setUpBeforeClass();
         $surveyFile = self::$surveysFolder . '/survey_archive_821351.lsa';
         self::importSurvey($surveyFile);
