@@ -130,14 +130,10 @@ class QuexmlPDFTest extends TestBaseClass
     {
         \Yii::app()->loadHelper('export');
         $quexml = quexml_export(self::$surveyId, 'es-AR', 1);
-        var_dump($quexml);
 
         $dom = new \DOMDocument('1.0', 'UTF-8');
-        var_dump($dom);
         $dom->loadXML($quexml);
-        var_dump($dom);
         $xpath = new \DOMXpath($dom);
-        var_dump($xpath);
         return $xpath;
     }
 
