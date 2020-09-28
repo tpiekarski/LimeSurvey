@@ -1,5 +1,6 @@
 <?php
 
+die('here');
 /* @deprecated moved to layouts/layout_questioneditor */
 //todo should be removed when all controllers have been refactored
 

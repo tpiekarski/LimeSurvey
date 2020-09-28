@@ -1,5 +1,7 @@
 <?php
 
+use LimeSurvey\Datavalueobjects\ActivateSurveyButton;
+
 Yii::import('application.helpers.common_helper', true);
 Yii::import('application.helpers.globalsettings_helper', true);
 
@@ -40,7 +42,15 @@ echo '<div '
     . '>';
 //New general top bar (VueComponent)
 //$this->_generaltopbar($aData);
-$layoutHelper->renderGeneraltopbar($aData);
+//$layoutHelper->renderGeneraltopbar($aData);
+$buttons = [
+    new ActivateSurveyButton(
+        [
+            'href' => $this->createUrl("surveyAdministration/activate/", ['iSurveyID' => $aData['oSurvey']->sid])
+        ]
+    )
+];
+$this->widget('ext.TopbarWidget.TopbarWidget', ['buttons' => $buttons]);
 
 echo '<div id="pjax-content" class="col-12">';
 
