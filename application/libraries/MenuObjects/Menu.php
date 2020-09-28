@@ -41,6 +41,9 @@ class Menu implements MenuInterface
      */
     protected $tooltip = "";
 
+    /** @var bool */
+    protected $disabled = false;
+
     /**
      * @param array $options - Options for either dropdown menu or plain link
      * @return void
@@ -73,6 +76,10 @@ class Menu implements MenuInterface
 
         if (isset($options['tooltip'])) {
             $this->tooltip = $options['tooltip'];
+        }
+
+        if (isset($options['disabled'])) {
+            $this->disabled = (bool) $options['disabled'];
         }
     }
 
@@ -130,5 +137,13 @@ class Menu implements MenuInterface
     public function getTooltip()
     {
         return $this->tooltip;
+    }
+
+    /**
+     * @return string
+     */
+    public function isDisabled()
+    {
+        return $this->disabled;
     }
 }

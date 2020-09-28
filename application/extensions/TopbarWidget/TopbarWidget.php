@@ -18,7 +18,7 @@ class TopbarWidget extends CWidget
     }
 
     /**
-     * @param MenuItemInterface $button
+     * @param MenuItemInterface|MenuInterface $button
      * @return string
      */
     protected function getViewName($button)
