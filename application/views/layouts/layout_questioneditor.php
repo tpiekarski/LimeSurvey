@@ -4,6 +4,8 @@ use LimeSurvey\Datavalueobjects\ActivateSurveyButton;
 use LimeSurvey\Menu\Menu;
 use LimeSurvey\Menu\DropdownMenu;
 use LimeSurvey\Menu\MenuItem;
+use LimeSurvey\Menu\DividerMenuItem;
+use LimeSurvey\Menu\SmalltextMenuItem;
 
 Yii::import('application.helpers.common_helper', true);
 Yii::import('application.helpers.globalsettings_helper', true);
@@ -57,7 +59,22 @@ $buttons = [
             'label' => gT('Preview survey'),
             'href' => 'todo',
             'iconClass' => 'fa fa-cog icon',
-            'menuItems' => [new MenuItem([])]
+            'menuItems' => [
+                new MenuItem([])
+            ]
+        ]
+    ),
+    new DropdownMenu(
+        [
+            'label' => gT('Tools'),
+            'href' => 'todo',
+            'iconClass' => 'icon-tools icon',
+            'menuItems' => [
+                new MenuItem([]),
+                new DividerMenuItem([]),
+                new SmalltextMenuItem([]),
+                new MenuItem([])
+            ]
         ]
     ),
     new Menu(
