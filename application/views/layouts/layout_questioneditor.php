@@ -1,6 +1,7 @@
 <?php
 
 use LimeSurvey\Datavalueobjects\ActivateSurveyButton;
+use LimeSurvey\Datavalueobjects\DisplayExportButton;
 use LimeSurvey\Menu\Menu;
 use LimeSurvey\Menu\DropdownMenu;
 use LimeSurvey\Menu\MenuItem;
@@ -92,12 +93,7 @@ $buttons = [
             'iconClass' => 'icon-responses icon'
         ]
     ),
-    new Menu(
-        [
-            'label' => gT('Display/Export'),
-            'iconClass' => 'fa fa-folder-open'
-        ]
-    )
+    new DisplayExportButton()
 ];
 $this->widget('ext.TopbarWidget.TopbarWidget', ['buttons' => $buttons]);
 
