@@ -1,6 +1,8 @@
 <?php
 
 use LimeSurvey\Datavalueobjects\ActivateSurveyButton;
+use LimeSurvey\Menu\Menu;
+use LimeSurvey\Menu\MenuItem;
 
 Yii::import('application.helpers.common_helper', true);
 Yii::import('application.helpers.globalsettings_helper', true);
@@ -47,6 +49,22 @@ $buttons = [
     new ActivateSurveyButton(
         [
             'href' => $this->createUrl("surveyAdministration/activate/", ['iSurveyID' => $aData['oSurvey']->sid])
+        ]
+    ),
+    new Menu(
+        [
+            'label' => gT('Preview survey'),
+            'href' => 'todo',
+            'isDropDown' => true,
+            'iconClass' => 'fa fa-cog icon',
+            'menuItems' => [new MenuItem([])]
+        ]
+    ),
+    new Menu(
+        [
+            'label' => gT('Survey participants'),
+            'href' => 'todo',
+            'iconClass' => 'fa fa-user icon'
         ]
     )
 ];

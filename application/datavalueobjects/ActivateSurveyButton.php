@@ -8,11 +8,13 @@ class ActivateSurveyButton extends MenuItem
 {
     /** @var string */
     protected $href = "#";
+
     /** @var string */
     protected $label;
-    /** @var string */
-    protected $iconClass = "";
 
+    /**
+     * @param array $options href required
+     */
     public function __construct($options)
     {
         $this->label = gT('Activate this survey');
