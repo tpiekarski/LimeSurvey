@@ -58,7 +58,6 @@ $buttons = [
     new DropdownMenu(
         [
             'label' => gT('Preview survey'),
-            'href' => 'todo',
             'iconClass' => 'fa fa-cog icon',
             'menuItems' => [
                 new MenuItem([])
@@ -68,7 +67,6 @@ $buttons = [
     new DropdownMenu(
         [
             'label' => gT('Tools'),
-            'href' => 'todo',
             'iconClass' => 'icon-tools icon',
             'menuItems' => [
                 new MenuItem([]),
@@ -81,13 +79,14 @@ $buttons = [
     new Menu(
         [
             'label' => gT('Survey participants'),
-            'href' => 'todo',
+            'href' => '#',
             'iconClass' => 'fa fa-user icon'
         ]
     ),
     new Menu(
         [
             'label' => gT('Responses'),
+            'href' => '#',
             'disabled' => true,
             'tooltip' => 'This survey is not active - no responses are available.',
             'iconClass' => 'icon-responses icon'
