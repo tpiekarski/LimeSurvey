@@ -2,6 +2,7 @@
     <div class="topbarpanel">
         <nav class="navbar navbar-default scoped-topbar-nav" style="border: none;">
             <div class="ls-flex ls-flex-row ls-space padding top-5">
+                <!-- TODO: Add support for left and right content -->
                 <ul class="nav navbar-nav scoped-topbar-nav ls-flex-item ls-flex-row grow-2 text-left">
                     <?= $content; ?>
                 </ul>

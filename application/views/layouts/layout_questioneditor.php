@@ -91,6 +91,12 @@ $buttons = [
             'tooltip' => 'This survey is not active - no responses are available.',
             'iconClass' => 'icon-responses icon'
         ]
+    ),
+    new Menu(
+        [
+            'label' => gT('Display/Export'),
+            'iconClass' => 'fa fa-folder-open'
+        ]
     )
 ];
 $this->widget('ext.TopbarWidget.TopbarWidget', ['buttons' => $buttons]);
