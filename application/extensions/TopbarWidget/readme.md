@@ -4,7 +4,7 @@ Small widget to render the LimeSurvey top-bar.
 
 This widget use classes based on the `Menu` and `MenuItem` classes found in `application/libraries/MenuObjects`.
 
-It works by looping the object list and render the view with the same name as the class name.
+It works by looping the object list and render the view with the same name as the class name, e.g. class `DropDownMenu` is rendered by view `dropdownmenu.php`.
 
 ## Usage
 
@@ -54,10 +54,10 @@ Folder `views/` contains a Yii view file for each supported button class. The pu
 > 
 > (3) where to store the html (should be in a view)
 
-Changing which buttons are shown for a controller are done in `getTopbarButtons()`.
+Changing which buttons are shown for a controller is done in `getTopbarButtons()`.
 
-To add a new button, use the `Menu` class or a subclass.
+To add a new button, use the `Menu` class or a subclass and add it to the button list.
 
-To add a new _type_ of button, add a new class in `buttons/` and a new view file in `views/`.
+To add a new _type_ of button, add a new class in `buttons/`, extending `Menu` or `MenuItem` (if dropdown item), and a new view file in `views/`.
 
 All HTML is stored in `views/`.
