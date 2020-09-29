@@ -107,11 +107,11 @@ class MenuItem implements MenuItemInterface
 
     public function isDropDown()
     {
-        throw new BadMethodCallException('Not implemented');
+        throw new \BadMethodCallException('Not implemented');
     }
 
     public function getMenuItems()
     {
-        throw new BadMethodCallException('Not implemented');
+        throw new \BadMethodCallException('Not implemented');
     }
 }
