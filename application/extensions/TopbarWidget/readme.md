@@ -18,6 +18,26 @@ Without autoloading, to use the special button classes, you need to run:
 
     Yii::import('ext.TopbarWidget.buttons.*');
 
+Example:
+
+    /**
+     * @return MenuInterface[]
+     */
+    public function getTopbarButtons()
+    {
+        Yii::import('ext.TopbarWidget.buttons.*');
+        $iSurveyID = $this->aData['oSurvey']->sid;
+
+        $buttons = [];
+        $buttons[] = new ActivateSurveyButton(
+            [
+                'href'          => $this->createUrl("surveyAdministration/activate/", ['iSurveyID' => $this->aData['oSurvey']->sid]),
+                'hasPermission' => Permission::model()->hasSurveyPermission($iSurveyID, 'surveyactivation', 'update')
+            ]
+        );
+        return $buttons;
+    }
+
 ## Files
 
 Folder `buttons/` contains short-hand classes to reduce code duplication.

@@ -2988,7 +2988,7 @@ class SurveyAdministrationController extends LSBaseController
     }
 
     /**
-     * @return Menu[]
+     * @return MenuInterface[]
      */
     public function getTopbarButtons()
     {
