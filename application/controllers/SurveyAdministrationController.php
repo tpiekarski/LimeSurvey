@@ -2998,7 +2998,7 @@ class SurveyAdministrationController extends LSBaseController
         $buttons = [];
         $buttons[] = new ActivateSurveyButton(
             [
-                'href'          => $this->createUrl("surveyAdministration/activate/", ['iSurveyID' => $this->aData['oSurvey']->sid]),
+                'href'          => $this->createUrl("surveyAdministration/activate/", ['iSurveyID' => $iSurveyID]),
                 'hasPermission' => Permission::model()->hasSurveyPermission($iSurveyID, 'surveyactivation', 'update')
             ]
         );
