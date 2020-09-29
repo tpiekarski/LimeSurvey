@@ -90,4 +90,14 @@ class MenuItem implements MenuItemInterface
     {
         return $this->href;
     }
+
+    public function isDropDown()
+    {
+        throw new BadMethodCallException('Not implemented');
+    }
+
+    public function getMenuItems()
+    {
+        throw new BadMethodCallException('Not implemented');
+    }
 }

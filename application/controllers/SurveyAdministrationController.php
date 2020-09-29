@@ -1,6 +1,11 @@
 <?php
 
 use LimeSurvey\Models\Services\FilterImportedResources;
+use LimeSurvey\Menu\Menu;
+use LimeSurvey\Menu\DropdownMenu;
+use LimeSurvey\Menu\MenuItem;
+use LimeSurvey\Menu\DividerMenuItem;
+use LimeSurvey\Menu\SmalltextMenuItem;
 
 class SurveyAdministrationController extends LSBaseController
 {
@@ -2982,4 +2987,59 @@ class SurveyAdministrationController extends LSBaseController
         return $aData;
     }
 
+    /**
+     * @return Menu[]
+     */
+    public function getTopbarButtons()
+    {
+        Yii::import('ext.TopbarWidget.buttons.*');
+
+        $buttons = [];
+        $buttons[] =
+            new ActivateSurveyButton(
+                [
+                    'href' => $this->createUrl("surveyAdministration/activate/", ['iSurveyID' => $this->aData['oSurvey']->sid])
+                ]
+            );
+        $buttons[] = new DropdownMenu(
+            [
+                'label' => gT('Preview survey'),
+                'iconClass' => 'fa fa-cog icon',
+                'menuItems' => [
+                    new MenuItem([])
+                ]
+            ]
+        );
+        $buttons[] = new DropdownMenu(
+            [
+                'label' => gT('Tools'),
+                'iconClass' => 'icon-tools icon',
+                'menuItems' => [
+                    new MenuItem([]),
+                    new DividerMenuItem([]),
+                    new SmalltextMenuItem([]),
+                    new MenuItem([])
+                ]
+            ]
+        );
+        $buttons[] = new Menu(
+            [
+                'label' => gT('Survey participants'),
+                'href' => '#',
+                'iconClass' => 'fa fa-user icon'
+            ]
+        );
+        $buttons[] = new Menu(
+            [
+                'label' => gT('Responses'),
+                'href' => '#',
+                'disabled' => true,
+                'tooltip' => 'This survey is not active - no responses are available.',
+                'iconClass' => 'icon-responses icon'
+            ]
+        );
+        $buttons[] = new DisplayExportButton();
+
+        return $buttons;
+    }
 }

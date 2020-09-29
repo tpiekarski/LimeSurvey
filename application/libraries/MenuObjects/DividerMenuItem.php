@@ -4,9 +4,8 @@ namespace LimeSurvey\Menu;
 
 class DividerMenuItem extends MenuItem
 {
-    public function __construct($options)
+    public function __construct()
     {
         $this->isDivider = true;
-        parent::__construct($options);
     }
 }

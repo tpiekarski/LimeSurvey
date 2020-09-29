@@ -1,7 +1,5 @@
 <?php
 
-namespace LimeSurvey\Datavalueobjects;
-
 use LimeSurvey\Menu\MenuItem;
 
 class DisplayExportButton extends MenuItem

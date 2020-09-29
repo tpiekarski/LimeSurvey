@@ -1,8 +1,14 @@
 <?php
 
+use LimeSurvey\Menu\MenuInterface;
+
 class TopbarWidget extends CWidget
 {
+    /** @var MenuInterface[] */
     public $buttons = [];
+
+    /** @var Permission */
+    public $permissionModel;
 
     public function run()
     {
@@ -18,10 +24,10 @@ class TopbarWidget extends CWidget
     }
 
     /**
-     * @param MenuItemInterface|MenuInterface $button
+     * @param MenuInterface $button
      * @return string
      */
-    protected function getViewName($button)
+    protected function getViewName(MenuInterface $button)
     {
         $parts = explode('\\', get_class($button));
         return strtolower(end($parts));

@@ -5,7 +5,7 @@ namespace LimeSurvey\Menu;
 /**
  * Interface descriptions here: https://manual.limesurvey.org/Extra_menus_event
  */
-interface MenuItemInterface
+interface MenuItemInterface extends MenuInterface
 {
     public function getHref();
     public function getLabel();
@@ -13,4 +13,3 @@ interface MenuItemInterface
     public function isDivider();
     public function isSmallText();
 }
-
