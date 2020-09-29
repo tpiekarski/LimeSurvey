@@ -96,6 +96,51 @@ $buttons = [
 ];
 $this->widget('ext.TopbarWidget.TopbarWidget', ['buttons' => $buttons]);
 
+?>
+<div class="container-fluid vue-general-topbar" style="width: 100%;">
+    <div class="topbarpanel">
+        <nav class="navbar navbar-default scoped-topbar-nav" style="border: none;">
+            <div class="ls-flex ls-flex-row ls-space padding top-5">
+<?php
+$this->widget('zii.widgets.CMenu', [
+    'htmlOptions' => [
+        'class' => 'nav navbar-nav scoped-topbar-nav ls-flex-item ls-flex-row grow-2 text-left'
+    ],
+    'items' => [
+        [
+            'label'       => 'Activate survey',
+            'url'         => ['site/index'],
+            'template'    => '<div class="topbarbutton">{menu}</div>',
+            'linkOptions' => ['class' => 'btn btn-primary topbarbutton' ]
+        ],
+        [
+            'label' => 'Preview survey',
+            'url'   => ['product/index'],
+            'template' => '<div class="topbarbutton"><div class="btn btn-default"><i class="fa fa-cog"></i>&nbsp;{menu}</div></div>',
+            'items' => [
+                [
+                    'label' => 'New Arrivals',
+                    'url'   => ['product/new', 'tag'=>'new']
+                ],
+                [
+                    'label' => 'Most Popular',
+                    'url'   => ['product/index', 'tag' => 'popular']
+                ],
+            ]
+        ],
+        [
+            'label' => 'Login',
+            'url'   => ['site/login']
+        ]
+    ]
+]);
+?>
+            </div>
+        </nav>
+    </div>
+</div>
+<?php
+
 echo '<div id="pjax-content" class="col-12">';
 
 echo '<div id="in_survey_common" '
