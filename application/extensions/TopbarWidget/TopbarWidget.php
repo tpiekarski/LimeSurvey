@@ -14,11 +14,13 @@ class TopbarWidget extends CWidget
     {
         $content = '';
         foreach ($this->buttons as $button) {
-            $content .= $this->render(
-                $this->getViewName($button),
-                ['button' => $button],
-                true
-            );
+            if ($button->hasPermission()) {
+                $content .= $this->render(
+                    $this->getViewName($button),
+                    ['button' => $button],
+                    true
+                );
+            }
         }
         $this->render('layout', ['content' => $content]);
     }

@@ -45,6 +45,11 @@ class Menu implements MenuInterface
     protected $disabled = false;
 
     /**
+     * @var bool
+     */
+    protected $hasPermission = false;
+
+    /**
      * @param array $options - Options for either dropdown menu or plain link
      * @return void
      */
@@ -80,6 +85,10 @@ class Menu implements MenuInterface
 
         if (isset($options['disabled'])) {
             $this->disabled = (bool) $options['disabled'];
+        }
+
+        if (isset($options['hasPermission'])) {
+            $this->hasPermission = (bool) $options['hasPermission'];
         }
     }
 
@@ -145,5 +154,13 @@ class Menu implements MenuInterface
     public function isDisabled()
     {
         return $this->disabled;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasPermission()
+    {
+        return $this->hasPermission;
     }
 }

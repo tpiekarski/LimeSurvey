@@ -2993,14 +2993,15 @@ class SurveyAdministrationController extends LSBaseController
     public function getTopbarButtons()
     {
         Yii::import('ext.TopbarWidget.buttons.*');
+        $iSurveyID = $this->aData['oSurvey']->sid;
 
         $buttons = [];
-        $buttons[] =
-            new ActivateSurveyButton(
-                [
-                    'href' => $this->createUrl("surveyAdministration/activate/", ['iSurveyID' => $this->aData['oSurvey']->sid])
-                ]
-            );
+        $buttons[] = new ActivateSurveyButton(
+            [
+                'href'          => $this->createUrl("surveyAdministration/activate/", ['iSurveyID' => $this->aData['oSurvey']->sid]),
+                'hasPermission' => Permission::model()->hasSurveyPermission($iSurveyID, 'surveyactivation', 'update')
+            ]
+        );
         $buttons[] = new DropdownMenu(
             [
                 'label' => gT('Preview survey'),
@@ -3026,7 +3027,7 @@ class SurveyAdministrationController extends LSBaseController
             [
                 'label' => gT('Survey participants'),
                 'href' => '#',
-                'iconClass' => 'fa fa-user icon'
+                'iconClass' => 'fa fa-user icon',
             ]
         );
         $buttons[] = new Menu(
@@ -3038,7 +3039,11 @@ class SurveyAdministrationController extends LSBaseController
                 'iconClass' => 'icon-responses icon'
             ]
         );
-        $buttons[] = new DisplayExportButton();
+        $buttons[] = new DisplayExportButton(
+            [
+                'hasPermission' => Permission::model()->hasSurveyPermission($iSurveyID, 'surveycontent', 'export')
+            ]
+        );
 
         return $buttons;
     }

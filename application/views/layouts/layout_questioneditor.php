@@ -41,7 +41,10 @@ echo '<div '
 //New general top bar (VueComponent)
 //$this->_generaltopbar($aData);
 //$layoutHelper->renderGeneraltopbar($aData);
-$this->widget('ext.TopbarWidget.TopbarWidget', ['buttons' => $this->getTopbarButtons()]);
+$this->widget(
+    'ext.TopbarWidget.TopbarWidget',
+    ['buttons' => $this->getTopbarButtons()]
+);
 
 echo '<div id="pjax-content" class="col-12">';
 

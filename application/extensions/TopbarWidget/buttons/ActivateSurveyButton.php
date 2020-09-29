@@ -10,6 +10,6 @@ class ActivateSurveyButton extends MenuItem
     public function __construct($options)
     {
         $this->label = gT('Activate this survey');
-        $this->href = $options['href'];
+        parent::__construct($options);
     }
 }

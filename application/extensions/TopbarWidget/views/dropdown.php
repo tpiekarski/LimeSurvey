@@ -14,20 +14,22 @@
 </button>
 <ul class="dropdown-menu" role="menu">
     <?php foreach ($button->getMenuItems() as $menuItem) : ?>
-        <?php if ($menuItem->isDivider()) : ?>
-            <li class="divider"></li>
-        <?php elseif ($menuItem->isSmallText()) : ?>
-            <li class="dropdown-header"><?= $menuItem->getLabel(); ?></li>
-        <?php else : ?>
-            <li>
-                <a href="<?= $menuItem->getHref(); ?>">
-                    <!-- Spit out icon if present -->
-                    <?php if ($menuItem->getIconClass() != '') : ?>
-                      <i class="<?= $menuItem->getIconClass(); ?>">&nbsp;</i>
-                    <?php endif; ?>
-                    <?= $menuItem->getLabel(); ?>
-                </a>
-            </li>
+        <?php if ($menuItem->hasPermission()) : ?>
+            <?php if ($menuItem->isDivider()) : ?>
+                <li class="divider"></li>
+            <?php elseif ($menuItem->isSmallText()) : ?>
+                <li class="dropdown-header"><?= $menuItem->getLabel(); ?></li>
+            <?php else : ?>
+                <li>
+                    <a href="<?= $menuItem->getHref(); ?>">
+                        <!-- Spit out icon if present -->
+                        <?php if ($menuItem->getIconClass() != '') : ?>
+                          <i class="<?= $menuItem->getIconClass(); ?>">&nbsp;</i>
+                        <?php endif; ?>
+                        <?= $menuItem->getLabel(); ?>
+                    </a>
+                </li>
+            <?php endif; ?>
         <?php endif; ?>
     <?php endforeach; ?>
 </ul>

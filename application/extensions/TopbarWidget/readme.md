@@ -23,3 +23,21 @@ Without autoloading, to use the special button classes, you need to run:
 Folder `buttons/` contains short-hand classes to reduce code duplication.
 
 Folder `views/` contains a Yii view file for each supported button class. The purpose is to separate data from HTML.
+
+## Comments
+
+> I think to following should be achieved:
+>
+> (1) make it easy to add/change a button
+> 
+> (2) find a place where to but the topbar buttons (alsways the same structure like conrtoller function getTopBarButtons()
+> 
+> (3) where to store the html (should be in a view)
+
+Changing which buttons are shown for a controller are done in `getTopbarButtons()`.
+
+To add a new button, use the `Menu` class or a subclass.
+
+To add a new _type_ of button, add a new class in `buttons/` and a new view file in `views/`.
+
+All HTML is stored in `views/`.

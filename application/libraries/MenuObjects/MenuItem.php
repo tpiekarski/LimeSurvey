@@ -14,6 +14,8 @@ class MenuItem implements MenuItemInterface
     protected $label = "Missing label";
     /** @var string */
     protected $iconClass = "";
+    /** @var bool */
+    protected $hasPermission = false;
 
     /**
      * @param array $options
@@ -38,6 +40,10 @@ class MenuItem implements MenuItemInterface
 
         if (isset($options['iconClass'])) {
             $this->iconClass = $options['iconClass'];
+        }
+
+        if (isset($options['hasPermission'])) {
+            $this->hasPermission = (bool) $options['hasPermission'];
         }
     }
 
@@ -89,6 +95,14 @@ class MenuItem implements MenuItemInterface
     public function __toString()
     {
         return $this->href;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasPermission()
+    {
+        return $this->hasPermission;
     }
 
     public function isDropDown()
