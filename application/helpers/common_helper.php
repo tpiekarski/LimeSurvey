@@ -1,4 +1,6 @@
-<?php if (!defined('BASEPATH')) {
+<?php use LimeSurvey\Datavalueobjects\FieldMap;
+
+if (!defined('BASEPATH')) {
     exit('No direct script access allowed');
 }
 /*
@@ -102,12 +104,12 @@ function getSurveyList($bReturnArray = false)
     static $cached = null;
     $bCheckIntegrity = false;
     $timeadjust = getGlobalSetting('timeadjust');
-    App()->setLanguage((isset(Yii::app()->session['adminlang']) ? Yii::app()->session['adminlang'] : 'en'));
+    App()->setLanguage((isset(App()->session['adminlang']) ? App()->session['adminlang'] : 'en'));
     $surveynames = array();
 
     if (is_null($cached)) {
         $surveyidresult = Survey::model()
-            ->permission(Yii::app()->user->getId())
+            ->permission(App()->user->getId())
             ->with('languagesettings')
             ->findAll();
         foreach ($surveyidresult as $result) {
@@ -141,19 +143,19 @@ function getSurveyList($bReturnArray = false)
 
         if ($sv['active'] != 'Y') {
             $inactivesurveys .= "<option ";
-            if (Yii::app()->user->getId() == $sv['owner_id']) {
+            if (App()->user->getId() == $sv['owner_id']) {
                 $inactivesurveys .= " class='mysurvey emphasis'";
             }
             $inactivesurveys .= " value='{$sv['sid']}'>{$surveylstitle}</option>\n";
         } elseif ($sv['expires'] != '' && $sv['expires'] < dateShift((string) date("Y-m-d H:i:s"), "Y-m-d H:i:s", $timeadjust)) {
             $expiredsurveys .= "<option ";
-            if (Yii::app()->user->getId() == $sv['owner_id']) {
+            if (App()->user->getId() == $sv['owner_id']) {
                 $expiredsurveys .= " class='mysurvey emphasis'";
             }
             $expiredsurveys .= " value='{$sv['sid']}'>{$surveylstitle}</option>\n";
         } else {
             $activesurveys .= "<option ";
-            if (Yii::app()->user->getId() == $sv['owner_id']) {
+            if (App()->user->getId() == $sv['owner_id']) {
                 $activesurveys .= " class='mysurvey emphasis'";
             }
             $activesurveys .= " value='{$sv['sid']}'>{$surveylstitle}</option>\n";
@@ -256,7 +258,7 @@ function convertGETtoPOST($url)
         $stack = explode('=', $queryitem);
         $paramname = array_shift($stack);
         $value = array_shift($stack);
-        if(in_array($paramname,array(Yii::app()->getComponent('urlManager')->routeVar))) {
+        if(in_array($paramname,array(App()->getComponent('urlManager')->routeVar))) {
             $getArray[$paramname] = $value;
         } else {
             $postArray[$paramname] = $value;
@@ -287,7 +289,7 @@ function calculateTotalFileUploadUsage()
     $aRows = Survey::findAll();
     $iTotalSize = 0.0;
     foreach ($aRows as $aRow) {
-        $sFilesPath = Yii::app()->getConfig("uploaddir").'/surveys/'.$aRow->sid.'/files';
+        $sFilesPath = App()->getConfig("uploaddir").'/surveys/'.$aRow->sid.'/files';
         if (file_exists($sFilesPath)) {
             $iTotalSize += (float) getDirectorySize($sFilesPath);
         }
@@ -356,7 +358,7 @@ function getMaxQuestionOrder($gid)
 {
     $gid = (int) $gid;
     $max_sql = "SELECT max( question_order ) AS max FROM {{questions}} WHERE gid={$gid}";
-    $current_max = Yii::app()->db->createCommand($max_sql)->queryScalar(); //Checked
+    $current_max = App()->db->createCommand($max_sql)->queryScalar(); //Checked
     if ($current_max == false) {
         return 0;
     } 
@@ -433,10 +435,10 @@ function getMaxQuestionOrder($gid)
 function setupColumns($columns, $answer_count, $wrapperclass = "", $itemclass = "")
 {
 
-    $column_style = Yii::app()->getConfig('column_style');
+    $column_style = App()->getConfig('column_style');
     if (!in_array($column_style, array('css', 'ul', 'table')) && !is_null($column_style)) {
         $column_style = 'ul';
-    };
+    }
     if (!is_null($column_style) && $columns != 1) {
 // Add a global class for all column
         $wrapperclass .= " colstyle-{$column_style}";
@@ -448,7 +450,7 @@ function setupColumns($columns, $answer_count, $wrapperclass = "", $itemclass = 
 
     if (($columns > $answer_count) && $answer_count > 0) {
         $columns = $answer_count;
-    };
+    }
 
 
     $class_first = ' class="'.$wrapperclass.'"';
@@ -466,7 +468,7 @@ function setupColumns($columns, $answer_count, $wrapperclass = "", $itemclass = 
         $class = ' class="'.$wrapperclass.'"';
         $class_last_ul = ' class="'.$wrapperclass.'"';
         $class_last_table = ' class="'.$wrapperclass.'"';
-    };
+    }
 
     $wrapper = array(
     'whole-start'  => "\n<ul$class_first>\n"
@@ -496,21 +498,21 @@ function setupColumns($columns, $answer_count, $wrapperclass = "", $itemclass = 
                     case 1:     $table_cols .= "\t<col$class_last_table />\n";
                         break;
                     default:    $table_cols .= "\t<col$class />\n";
-                };
-            };
+                }
+            }
 
             if ($columns > 1) {
                 $wrapper['col-devide'] = "\t</ul>\n</td>\n\n<td>\n\t<ul>\n";
                 $wrapper['col-devide-last'] = "\t</ul>\n</td>\n\n<td class=\"last\">\n\t<ul>\n";
-            };
+            }
             $wrapper['whole-start'] = "\n<table$class>\n$table_cols\n\t<tbody>\n<tr>\n<td>\n\t<ul>\n";
             $wrapper['whole-end']   = "\t</ul>\n</td>\n</tr>\n\t</tbody>\n</table>\n";
             $wrapper['item-start']  = "<li class=\"{$itemclass}\">\n";
             $wrapper['item-end']    = "</li class=\"{$itemclass}\">\n";
-    };
+    }
 
     return $wrapper;
-};
+}
 
 function alternation($alternate = '', $type = 'col')
 {
@@ -549,12 +551,12 @@ function alternation($alternate = '', $type = 'col')
 // cols is answers part OR X axis subquestion : it must the row in array by column
         $odd  = 'ls-col-odd';
         $even = 'ls-col-even';
-    };
+    }
     if ($alternate == $odd) {
         $alternate = $even;
     } else {
         $alternate = $odd;
-    };
+    }
     return $alternate;
 }
 
@@ -573,9 +575,9 @@ function longestString($new_string, $longest_length)
 {
     if ($longest_length < strlen(trim(strip_tags($new_string)))) {
         $longest_length = strlen(trim(strip_tags($new_string)));
-    };
+    }
     return $longest_length;
-};
+}
 
 //FIXME rename and/or document this
 function getGroupList3($gid, $surveyid)
@@ -615,13 +617,13 @@ function getGroupListLang($gid, $language, $surveyid)
         $aAttributes = $oGroup->attributes;
         $groupselecter .= "<option";
         if ($aAttributes['gid'] == $gid) {$groupselecter .= " selected='selected'"; $gvexist = 1; }
-        $link = Yii::app()->getController()->createUrl("/questionGroupsAdministration/view/surveyid/".$surveyid."/gid/".$aAttributes['gid']);
+        $link = App()->getController()->createUrl("/questionGroupsAdministration/view/surveyid/".$surveyid."/gid/".$aAttributes['gid']);
         $groupselecter .= " value='{$link}'>";
         $groupselecter .= htmlspecialchars(strip_tags($oGroup->questiongroupl10ns[$language]->group_name));
         $groupselecter .= "</option>\n";
     }
     if ($groupselecter) {
-        $link = Yii::app()->getController()->createUrl("/surveyAdministration/view/surveyid/".$surveyid);
+        $link = App()->getController()->createUrl("/surveyAdministration/view/surveyid/".$surveyid);
         if (!isset($gvexist)) {$groupselecter = "<option selected='selected'>".gT("Please choose...")."</option>\n".$groupselecter; } else {$groupselecter .= "<option value='{$link}'>".gT("None")."</option>\n"; }
     }
     return $groupselecter;
@@ -630,14 +632,14 @@ function getGroupListLang($gid, $language, $surveyid)
 
 function getUserList($outputformat = 'fullinfoarray')
 {
-    if (!empty(Yii::app()->session['loginID'])) {
-        $myuid = sanitize_int(Yii::app()->session['loginID']);
+    if (!empty(App()->session['loginID'])) {
+        $myuid = sanitize_int(App()->session['loginID']);
     }
-    $usercontrolSameGroupPolicy = Yii::app()->getConfig('usercontrolSameGroupPolicy');
+    $usercontrolSameGroupPolicy = App()->getConfig('usercontrolSameGroupPolicy');
     if (!Permission::model()->hasGlobalPermission('superadmin', 'read') && isset($usercontrolSameGroupPolicy) &&
     $usercontrolSameGroupPolicy == true) {
         if (isset($myuid)) {
-            $sDatabaseType = Yii::app()->db->getDriverName();
+            $sDatabaseType = App()->db->getDriverName();
             if ($sDatabaseType == 'mssql' || $sDatabaseType == "sqlsrv" || $sDatabaseType == "dblib") {
                 $sSelectFields = 'users_name,uid,email,full_name,parent_id,CAST(password as varchar) as password';
             } else {
@@ -665,25 +667,25 @@ function getUserList($outputformat = 'fullinfoarray')
         $uquery = "SELECT * FROM {{users}} ORDER BY uid";
     }
 
-    $uresult = Yii::app()->db->createCommand($uquery)->query()->readAll(); //Checked
+    $uresult = App()->db->createCommand($uquery)->query()->readAll(); //Checked
 
     if (count($uresult) == 0 && !empty($myuid)) {
 //user is not in a group and usercontrolSameGroupPolicy is activated - at least show his own userinfo
         $uquery = "SELECT u.* FROM {{users}} AS u WHERE u.uid=".$myuid;
-        $uresult = Yii::app()->db->createCommand($uquery)->query()->readAll(); //Checked
+        $uresult = App()->db->createCommand($uquery)->query()->readAll(); //Checked
     }
 
     $userlist = array();
     $userlist[0] = "Reserved for logged in user";
     foreach ($uresult as $srow) {
         if ($outputformat != 'onlyuidarray') {
-            if ($srow['uid'] != Yii::app()->session['loginID']) {
+            if ($srow['uid'] != App()->session['loginID']) {
                 $userlist[] = array("user"=>$srow['users_name'], "uid"=>$srow['uid'], "email"=>$srow['email'], "password"=>$srow['password'], "full_name"=>$srow['full_name'], "parent_id"=>$srow['parent_id']);
             } else {
                 $userlist[0] = array("user"=>$srow['users_name'], "uid"=>$srow['uid'], "email"=>$srow['email'], "password"=>$srow['password'], "full_name"=>$srow['full_name'], "parent_id"=>$srow['parent_id']);
             }
         } else {
-            if ($srow['uid'] != Yii::app()->session['loginID']) {
+            if ($srow['uid'] != App()->session['loginID']) {
                 $userlist[] = $srow['uid'];
             } else {
                 $userlist[0] = $srow['uid'];
@@ -761,8 +763,8 @@ function getSurveyInfo($surveyid, $languagecode = '', $force = false)
             $thissurvey['email_register'] = $thissurvey['surveyls_email_register'];
             $thissurvey['attributedescriptions'] = $result->survey->tokenAttributes;
             $thissurvey['attributecaptions'] = $result->attributeCaptions;
-            if (!isset($thissurvey['adminname'])) {$thissurvey['adminname'] = Yii::app()->getConfig('siteadminemail'); }
-            if (!isset($thissurvey['adminemail'])) {$thissurvey['adminemail'] = Yii::app()->getConfig('siteadminname'); }
+            if (!isset($thissurvey['adminname'])) {$thissurvey['adminname'] = App()->getConfig('siteadminemail'); }
+            if (!isset($thissurvey['adminemail'])) {$thissurvey['adminemail'] = App()->getConfig('siteadminname'); }
             if (!isset($thissurvey['urldescrip']) || $thissurvey['urldescrip'] == '') {$thissurvey['urldescrip'] = $thissurvey['surveyls_url']; }
 
             if ($result->survey->owner_id == -1 && !empty($oSurvey->oOptions->owner_id)){
@@ -832,7 +834,7 @@ function groupOrderThenQuestionOrder($a, $b)
 function fixMovedQuestionConditions($qid, $oldgid, $newgid, $iSurveyID = null) //Function rewrites the cfieldname for a question after group change
 {
     if (!isset($iSurveyID)) {
-            $iSurveyID = Yii::app()->getConfig('sid');
+            $iSurveyID = App()->getConfig('sid');
     }
     $qid = (int) $qid;
     $oldgid = (int) $oldgid;
@@ -852,8 +854,8 @@ function fixMovedQuestionConditions($qid, $oldgid, $newgid, $iSurveyID = null) /
  */
 function returnGlobal($stringname, $bRestrictToString = false)
 {
-    $urlParam = Yii::app()->request->getParam($stringname);
-    $aCookies = Yii::app()->request->getCookies();
+    $urlParam = App()->request->getParam($stringname);
+    $aCookies = App()->request->getCookies();
     if (is_null($urlParam) && $stringname != 'sid') {
         if (isset($aCookies[$stringname])) {
             $urlParam = $aCookies[$stringname];
@@ -905,7 +907,7 @@ function returnGlobal($stringname, $bRestrictToString = false)
 function sendCacheHeaders()
 {
     if (!headers_sent()) {
-        if (Yii::app()->getConfig('x_frame_options', 'allow') == 'sameorigin') {
+        if (App()->getConfig('x_frame_options', 'allow') == 'sameorigin') {
             header('X-Frame-Options: SAMEORIGIN');
         }
         header('P3P:CP="IDC DSP COR ADM DEVi TAIi PSA PSD IVAi IVDi CONi HIS OUR IND CNT"'); // this line lets IE7 run LimeSurvey in an iframe
@@ -1051,7 +1053,6 @@ function getExtendedAnswer($iSurveyID, $sFieldCode, $sValue, $sLanguage)
                 }
                 break;
             default:
-                ;
         } // switch
     }
     switch ($sFieldCode) {
@@ -1108,7 +1109,7 @@ function createCompleteSGQA($iSurveyID, $aFilters, $sLanguage)
 {
     $allfields = [];
     foreach ($aFilters as $flt) {
-        Yii::app()->loadHelper("surveytranslator");
+        App()->loadHelper("surveytranslator");
         $myfield = "{$iSurveyID}X{$flt['gid']}X{$flt['qid']}";
         $oSurvey = Survey::model()->findByPk($iSurveyID);
         $aAdditionalLanguages = array_filter(explode(" ", $oSurvey->additional_languages));
@@ -1209,29 +1210,25 @@ function createCompleteSGQA($iSurveyID, $aFilters, $sLanguage)
 
 }
 
-
-
-
-
 /**
-* This function generates an array containing the fieldcode, and matching data in the same order as the activate script
-*
-* @param Survey $survey Survey ActiveRecord model
-* @param string $style 'short' (default) or 'full' - full creates extra information like default values
-* @param boolean $force_refresh - Forces to really refresh the array, not just take the session copy
-* @param bool|int $questionid Limit to a certain qid only (for question preview) - default is false
-* @param string $sLanguage The language to use
-* @param array $aDuplicateQIDs
-* @return array
-*/
+ * This function generates an array containing the fieldcode, and matching data in the same order as the activate script
+ *
+ * @param Survey $survey Survey ActiveRecord model
+ * @param string $style 'short' (default) or 'full' - full creates extra information like default values
+ * @param boolean $force_refresh - Forces to really refresh the array, not just take the session copy
+ * @param bool|int $questionid Limit to a certain qid only (for question preview) - default is false
+ * @param string $sLanguage The language to use
+ * @param array $aDuplicateQIDs
+ * @return array
+ * @throws CException
+ */
 function createFieldMap($survey, $style = 'short', $force_refresh = false, $questionid = false, $sLanguage = '', &$aDuplicateQIDs = array())
 {
-
     $sLanguage = sanitize_languagecode($sLanguage);
     $surveyid = $survey->sid;
     //checks to see if fieldmap has already been built for this page.
-    if (isset(Yii::app()->session['fieldmap-'.$surveyid.$sLanguage]) && !$force_refresh && $questionid === false) {
-        return Yii::app()->session['fieldmap-'.$surveyid.$sLanguage];
+    if (isset(App()->session['fieldmap-'.$surveyid.$sLanguage]) && !$force_refresh && $questionid === false) {
+        return App()->session['fieldmap-'.$surveyid.$sLanguage];
     }
     /* Check if $sLanguage is a survey valid language (else $fieldmap is empty) */
     if ($sLanguage == '' || !in_array($sLanguage, $survey->allLanguages)) {
@@ -1345,7 +1342,7 @@ function createFieldMap($survey, $style = 'short', $force_refresh = false, $ques
     . " AND al10.language = '{$sLanguage}'"
     . " AND b.same_default=0"
     . " AND b.sid = ".$surveyid;
-    $defaultResults = Yii::app()->db->createCommand($defaultsQuery)->queryAll();
+    $defaultResults = App()->db->createCommand($defaultsQuery)->queryAll();
 
     $defaultValues = array(); // indexed by question then subquestion
     foreach ($defaultResults as $dv) {
@@ -1366,7 +1363,7 @@ function createFieldMap($survey, $style = 'short', $force_refresh = false, $ques
     . " AND al10.language = '{$baseLanguage}'"
     . " AND b.same_default=1"
     . " AND b.sid = ".$surveyid;
-    $defaultResults = Yii::app()->db->createCommand($defaultsQuery)->queryAll();
+    $defaultResults = App()->db->createCommand($defaultsQuery)->queryAll();
 
     foreach ($defaultResults as $dv) {
         if ($dv['specialtype'] != '') {
@@ -1379,7 +1376,7 @@ function createFieldMap($survey, $style = 'short', $force_refresh = false, $ques
     $qtypes = Question::typeList();
 
     // Main query
-    $quotedGroups = Yii::app()->db->quoteTableName('{{groups}}');
+    $quotedGroups = App()->db->quoteTableName('{{groups}}');
     $aquery = "SELECT g.*, q.*, gls.*, qls.*, qa.attribute, qa.value"
     ." FROM $quotedGroups g"
     .' JOIN {{questions}} q on q.gid=g.gid '
@@ -1394,7 +1391,7 @@ function createFieldMap($survey, $style = 'short', $force_refresh = false, $ques
     }
     $aquery .= " ORDER BY group_order, question_order";
     /** @var Question[] $questions */
-    $questions = Yii::app()->db->createCommand($aquery)->queryAll();
+    $questions = App()->db->createCommand($aquery)->queryAll();
     $questionSeq = -1; // this is incremental question sequence across all groups
     $groupSeq = -1;
     $_groupOrder = -1;
@@ -1834,16 +1831,16 @@ function createFieldMap($survey, $style = 'short', $force_refresh = false, $ques
         }
 
         if (isset($fieldmap[$fieldname]['typename'])) {
-                    $fieldmap[$fieldname]['typename'] = $typename[$fieldname] = $arow['typename'];
+            $fieldmap[$fieldname]['typename'] = $typename[$fieldname] = $arow['typename'];
         }
     }
     App()->setLanguage($sOldLanguage);
 
     if ($questionid === false) {
         // If the fieldmap was randomized, the master will contain the proper order.  Copy that fieldmap with the new language settings.
-        if (isset(Yii::app()->session['survey_'.$surveyid]['fieldmap-'.$surveyid.'-randMaster'])) {
-            $masterFieldmap = Yii::app()->session['survey_'.$surveyid]['fieldmap-'.$surveyid.'-randMaster'];
-            $mfieldmap = Yii::app()->session['survey_'.$surveyid][$masterFieldmap];
+        if (isset(App()->session['survey_'.$surveyid]['fieldmap-'.$surveyid.'-randMaster'])) {
+            $masterFieldmap = App()->session['survey_'.$surveyid]['fieldmap-'.$surveyid.'-randMaster'];
+            $mfieldmap = App()->session['survey_'.$surveyid][$masterFieldmap];
 
             foreach ($mfieldmap as $fieldname => $mf) {
                 if (isset($fieldmap[$fieldname])) {
@@ -1859,7 +1856,7 @@ function createFieldMap($survey, $style = 'short', $force_refresh = false, $ques
             $fieldmap = $mfieldmap;
         }
 
-        Yii::app()->session['fieldmap-'.$surveyid.$sLanguage] = $fieldmap;
+        App()->session['fieldmap-'.$surveyid.$sLanguage] = $fieldmap;
     }
     return $fieldmap;
 }
@@ -1964,7 +1961,7 @@ function buildLabelSetCheckSumArray()
         join {{label_l10ns}} ls on label_id=l.id
         WHERE lid={$row['lid']}
         ORDER BY language, sortorder, code";
-        $result2 = Yii::app()->db->createCommand($query2)->query();
+        $result2 = App()->db->createCommand($query2)->query();
         foreach ($result2->readAll() as $row2) {
             $thisset .= implode('.', $row2);
         } // while
@@ -2135,7 +2132,7 @@ function SendEmailMessage($body, $subject, $to, $from, $sitename, $ishtml = fals
 
     $sent = $mail->Send();
     $maildebug = $mail->ErrorInfo;
-    if (Yii::app()->getConfig("emailsmtpdebug") > 0 && $mail->getDebug()) {
+    if (App()->getConfig("emailsmtpdebug") > 0 && $mail->getDebug()) {
         $maildebug .= '<br><strong>'.gT('SMTP debug output:').'</strong>'.$mail->getDebug('html');
     }
     return $sent;
@@ -2294,7 +2291,7 @@ function languageDropdown($surveyid, $selected)
     $html = "<select class='listboxquestions' name='langselect' onchange=\"window.open(this.options[this.selectedIndex].value, '_top')\">\n";
 
     foreach ($slangs as $lang) {
-        $link = Yii::app()->homeUrl.("/admin/dataentry/sa/view/surveyid/".$surveyid."/lang/".$lang);
+        $link = App()->homeUrl.("/admin/dataentry/sa/view/surveyid/".$surveyid."/lang/".$lang);
         if ($lang == $selected) {
             $html .= "\t<option value='{$link}' selected='selected'>".getLanguageNameFromCode($lang, false)."</option>\n";
         }
@@ -2395,14 +2392,14 @@ function incompleteAnsFilterState()
     // first let's initialize the incompleteanswers session variable
     if ($letsfilter != '') {
 // use the read value if not empty
-        Yii::app()->session['incompleteanswers'] = $letsfilter;
-    } elseif (empty(Yii::app()->session['incompleteanswers'])) {
+        App()->session['incompleteanswers'] = $letsfilter;
+    } elseif (empty(App()->session['incompleteanswers'])) {
 // sets default variable value from config file
-        Yii::app()->session['incompleteanswers'] = Yii::app()->getConfig('filterout_incomplete_answers');
+        App()->session['incompleteanswers'] = App()->getConfig('filterout_incomplete_answers');
     }
 
-    if (Yii::app()->session['incompleteanswers'] == 'complete' || Yii::app()->session['incompleteanswers'] == 'all' || Yii::app()->session['incompleteanswers'] == 'incomplete') {
-        return Yii::app()->session['incompleteanswers'];
+    if (App()->session['incompleteanswers'] == 'complete' || App()->session['incompleteanswers'] == 'all' || App()->session['incompleteanswers'] == 'incomplete') {
+        return App()->session['incompleteanswers'];
     } else {
 // last resort is to prevent filtering
         return 'all';
@@ -2460,8 +2457,8 @@ function isCaptchaEnabled($screen, $captchamode = '')
 */
 function tableExists($sTableName)
 {
-    $sTableName = Yii::app()->db->tablePrefix.str_replace(array('{', '}'), array('', ''), $sTableName);
-    return in_array($sTableName, Yii::app()->db->schema->getTableNames());
+    $sTableName = App()->db->tablePrefix.str_replace(array('{', '}'), array('', ''), $sTableName);
+    return in_array($sTableName, App()->db->schema->getTableNames());
 }
 
 // Returns false if the survey is anonymous,
@@ -2552,11 +2549,11 @@ function translateLinks($sType, $iOldSurveyID, $iNewSurveyID, $sString)
     $iNewSurveyID = (int) $iNewSurveyID; // To avoid injection of a /e regex modifier without having to check all execution paths
     if ($sType == 'survey') {
         $sPattern = '(http(s)?:\/\/)?(([a-z0-9\/\.])*(?=(\/upload))\/upload\/surveys\/'.$iOldSurveyID.'\/)';
-        $sReplace = Yii::app()->getConfig("publicurl")."upload/surveys/{$iNewSurveyID}/";
+        $sReplace = App()->getConfig("publicurl")."upload/surveys/{$iNewSurveyID}/";
         return preg_replace('/'.$sPattern.'/u', $sReplace, $sString);
     } elseif ($sType == 'label') {
         $sPattern = '(http(s)?:\/\/)?(([a-z0-9\/\.])*(?=(\/upload))\/upload\/labels\/'.$iOldSurveyID.'\/)';
-        $sReplace = Yii::app()->getConfig("publicurl")."upload/labels/{$iNewSurveyID}/";
+        $sReplace = App()->getConfig("publicurl")."upload/labels/{$iNewSurveyID}/";
         return preg_replace("/".$sPattern."/u", $sReplace, $sString);
     } else // unknown type
     {
@@ -2613,7 +2610,7 @@ function reverseTranslateFieldNames($iOldSID, $iNewSID, $aGIDReplacements, $aQID
  */
 function hasResources($id, $type = 'survey')
 {
-    $dirname = Yii::app()->getConfig("uploaddir");
+    $dirname = App()->getConfig("uploaddir");
 
     if ($type == 'survey') {
         $dirname .= "/surveys/$id";
@@ -2744,7 +2741,7 @@ function filterForAttributes($fieldname)
 function getAttributeFieldNames($iSurveyID)
 {
     $survey = Survey::model()->findByPk($iSurveyID);
-    if (!$survey->hasTokensTable || !$table = Yii::app()->db->schema->getTable($survey->tokensTableName)) {
+    if (!$survey->hasTokensTable || !$table = App()->db->schema->getTable($survey->tokensTableName)) {
             return Array();
     }
 
@@ -2762,7 +2759,7 @@ function getAttributeFieldNames($iSurveyID)
 function getParticipantAttributes($iSurveyID)
 {
     $survey = Survey::model()->findByPk($iSurveyID);
-    if (!$survey->hasTokensTable || !Yii::app()->db->schema->getTable($survey->tokensTableName)) {
+    if (!$survey->hasTokensTable || !App()->db->schema->getTable($survey->tokensTableName)) {
             return Array();
     }
     return getTokenFieldsAndNames($iSurveyID, true);
@@ -2897,14 +2894,14 @@ function showJavaScript($sContent)
 */
 function cleanTempDirectory()
 {
-    $dir = Yii::app()->getConfig('tempdir').DIRECTORY_SEPARATOR;
+    $dir = App()->getConfig('tempdir').DIRECTORY_SEPARATOR;
     $dp = opendir($dir) or safeDie('Could not open temporary directory');
     while ($file = readdir($dp)) {
         if (is_file($dir.$file) && (filemtime($dir.$file)) < (strtotime('-1 days')) && $file != 'index.html' && $file != '.gitignore' && $file != 'readme.txt') {
             /** @scrutinizer ignore-unhandled */ @unlink($dir.$file);
         }
     }
-    $dir = Yii::app()->getConfig('tempdir').DIRECTORY_SEPARATOR.'upload'.DIRECTORY_SEPARATOR;
+    $dir = App()->getConfig('tempdir').DIRECTORY_SEPARATOR.'upload'.DIRECTORY_SEPARATOR;
     $dp = opendir($dir) or safeDie('Could not open temporary upload directory');
     while ($file = readdir($dp)) {
         if (is_file($dir.$file) && (filemtime($dir.$file)) < (strtotime('-1 days')) && $file != 'index.html' && $file != '.gitignore' && $file != 'readme.txt') {
@@ -2918,8 +2915,8 @@ function useFirebug()
 {
     if (FIREBUG == true) {
         App()->getClientScript()->registerScriptFile('http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js');
-    };
-};
+    }
+}
 
 /**
 * This is a convenience function for the coversion of datetime values
@@ -2951,7 +2948,7 @@ function convertDateTimeFormat($value, $fromdateformat, $todateformat)
 function convertToGlobalSettingFormat($sDate, $withTime = false)
 {
 
-    $sDateformatdata = getDateFormatData(Yii::app()->session['dateformat']); // We get the Global Setting date format
+    $sDateformatdata = getDateFormatData(App()->session['dateformat']); // We get the Global Setting date format
     $usedDatetime = ($withTime === true ? $sDateformatdata['phpdate']." H:i" : $sDateformatdata['phpdate']); //return also hours and minutes if asked for
     try {
         // Workaround for bug in older PHP version (confirmed for 5.5.9)
@@ -3031,7 +3028,7 @@ function getSubQuestions($sid, $qid, $sLanguage)
         ." WHERE sq.parent_qid=q.qid AND ls.language='{$sLanguage}' AND q.sid=".$sid
         ." ORDER BY sq.parent_qid, q.question_order,sq.scale_id, sq.question_order";
 
-        $query = Yii::app()->db->createCommand($query)->query();
+        $query = App()->db->createCommand($query)->query();
 
         $resultset = array();
         foreach ($query->readAll() as $row) {
@@ -3071,9 +3068,9 @@ function SSLRedirect($enforceSSLMode)
         //ob_clean();
         header('Location: '.$url);
         //ob_flush();
-        Yii::app()->end();
-    };
-};
+        App()->end();
+    }
+}
 
 /**
 * enforceSSLMode() $force_ssl is on or off, it checks if the current
@@ -3088,14 +3085,14 @@ function enforceSSLMode()
     $bSSLActive = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != "off") ||
     (isset($_SERVER['HTTP_FORWARDED_PROTO']) && $_SERVER['HTTP_FORWARDED_PROTO'] == "https") ||
     (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == "https"));
-    if (Yii::app()->getConfig('ssl_emergency_override') !== true) {
+    if (App()->getConfig('ssl_emergency_override') !== true) {
         $bForceSSL = strtolower(getGlobalSetting('force_ssl'));
     } 
     if ($bForceSSL == 'on' && !$bSSLActive) {
         SSLRedirect('s');
     }
 
-};
+}
 
 
 /**
@@ -3205,7 +3202,7 @@ function isNumericInt($mStr)
 */
 function short_implode($sDelimeter, $sHyphen, $aArray)
 {
-    if (sizeof($aArray) < Yii::app()->getConfig('minlengthshortimplode')) {
+    if (sizeof($aArray) < App()->getConfig('minlengthshortimplode')) {
         sort($aArray);
         return implode($sDelimeter, $aArray);
     } else {
@@ -3216,7 +3213,7 @@ function short_implode($sDelimeter, $sHyphen, $aArray)
             if ($iIndexA == 0) {
                 $sResult = $aArray[$iIndexA];
             } else {
-                if (strlen($sResult) > Yii::app()->getConfig('maxstringlengthshortimplode') - strlen($sDelimeter) - 3) {
+                if (strlen($sResult) > App()->getConfig('maxstringlengthshortimplode') - strlen($sDelimeter) - 3) {
                     return $sResult.$sDelimeter.'...';
                 } else {
                     $sResult = $sResult.$sDelimeter.$aArray[$iIndexA];
@@ -3242,13 +3239,13 @@ function short_implode($sDelimeter, $sHyphen, $aArray)
 */
 function includeKeypad()
 {
-    App()->getClientScript()->registerScriptFile(Yii::app()->getConfig('third_party').'jquery-keypad/jquery.plugin.min.js');
-    App()->getClientScript()->registerScriptFile(Yii::app()->getConfig('third_party').'jquery-keypad/jquery.keypad.min.js');
-    $localefile = Yii::app()->getConfig('rootdir').'/third_party/jquery-keypad/jquery.keypad-'.App()->language.'.js';
+    App()->getClientScript()->registerScriptFile(App()->getConfig('third_party').'jquery-keypad/jquery.plugin.min.js');
+    App()->getClientScript()->registerScriptFile(App()->getConfig('third_party').'jquery-keypad/jquery.keypad.min.js');
+    $localefile = App()->getConfig('rootdir').'/third_party/jquery-keypad/jquery.keypad-'.App()->language.'.js';
     if (App()->language != 'en' && file_exists($localefile)) {
-        Yii::app()->getClientScript()->registerScriptFile(Yii::app()->getConfig('third_party').'jquery-keypad/jquery.keypad-'.App()->language.'.js');
+        App()->getClientScript()->registerScriptFile(App()->getConfig('third_party').'jquery-keypad/jquery.keypad-'.App()->language.'.js');
     }
-    Yii::app()->getClientScript()->registerCssFile(Yii::app()->getConfig('third_party')."jquery-keypad/jquery.keypad.alt.css");
+    App()->getClientScript()->registerCssFile(App()->getConfig('third_party')."jquery-keypad/jquery.keypad.alt.css");
 }
 
 
@@ -3265,7 +3262,7 @@ function translateInsertansTags($newsid, $oldsid, $fieldnames)
     {
 return strlen($a) < strlen($b); });
 
-    Yii::app()->loadHelper('database');
+    App()->loadHelper('database');
     $newsid = (int) $newsid;
     $oldsid = (int) $oldsid;
 
@@ -3325,11 +3322,11 @@ return strlen($a) < strlen($b); });
     } // end while qentry
 
     # translate 'description' INSERTANS tags in groups
-    $quotedGroups = Yii::app()->db->quoteTableName('{{groups}}');
+    $quotedGroups = App()->db->quoteTableName('{{groups}}');
     $sql = "SELECT g.gid, language, group_name, description from $quotedGroups g
     join {{group_l10ns}} l on g.gid=l.gid
     WHERE sid=".$newsid." AND description LIKE '%{$oldsid}X%' OR group_name LIKE '%{$oldsid}X%'";
-    $res = Yii::app()->db->createCommand($sql)->query();
+    $res = App()->db->createCommand($sql)->query();
 
     //while ($qentry = $res->FetchRow())
     foreach ($res->readAll() as $qentry) {
@@ -3363,7 +3360,7 @@ return strlen($a) < strlen($b); });
     $sql = "SELECT q.qid, language, question, help from {{questions}} q
     join {{question_l10ns}} l on q.qid=l.qid
     WHERE sid=".$newsid." AND (question LIKE '%{$oldsid}X%' OR help LIKE '%{$oldsid}X%')";
-    $result = Yii::app()->db->createCommand($sql)->query();
+    $result = App()->db->createCommand($sql)->query();
     $aResultData = $result->readAll();
     foreach ($aResultData as $qentry) {
         $question = $qentry['question'];
@@ -3503,7 +3500,7 @@ function replaceExpressionCodes($iSurveyID, $aCodeMap)
 */
 function cleanLanguagesFromSurvey($iSurveyID, $availlangs)
 {
-    Yii::app()->loadHelper('database');
+    App()->loadHelper('database');
     $iSurveyID = (int) $iSurveyID;
     $baselang = Survey::model()->findByPk($iSurveyID)->language;
     $aLanguages = [];
@@ -3528,27 +3525,27 @@ function cleanLanguagesFromSurvey($iSurveyID, $availlangs)
             JOIN {{answers}} a on ls.aid=a.aid 
             JOIN {{questions}} q on a.qid=q.qid
             WHERE sid={$iSurveyID} AND {$sqllang}";
-    $result = Yii::app()->db->createCommand($sQuery)->queryAll();
+    $result = App()->db->createCommand($sQuery)->queryAll();
     foreach ($result as $row) {
-        Yii::app()->db->createCommand('delete from {{answer_l10ns}} where id ='.$row['id'])->execute();
+        App()->db->createCommand('delete from {{answer_l10ns}} where id ='.$row['id'])->execute();
     }
     // Remove From Questions Table
     $sQuery = "SELECT ls.id from {{question_l10ns}} ls 
             JOIN {{questions}} q on ls.qid=q.qid
             WHERE sid={$iSurveyID} AND {$sqllang}";
-    $result = Yii::app()->db->createCommand($sQuery)->queryAll();
+    $result = App()->db->createCommand($sQuery)->queryAll();
     foreach ($result as $row) {
-        Yii::app()->db->createCommand('delete from {{question_l10ns}} where id ='.$row['id'])->execute();
+        App()->db->createCommand('delete from {{question_l10ns}} where id ='.$row['id'])->execute();
     }
 
     // Remove From Questions Table
-    $quotedGroups = Yii::app()->db->quoteTableName('{{groups}}');
+    $quotedGroups = App()->db->quoteTableName('{{groups}}');
     $sQuery = "SELECT ls.id from {{group_l10ns}} ls 
             JOIN $quotedGroups g on ls.gid=g.gid
             WHERE sid={$iSurveyID} AND {$sqllang}";
-    $result = Yii::app()->db->createCommand($sQuery)->queryAll();
+    $result = App()->db->createCommand($sQuery)->queryAll();
     foreach ($result as $row) {
-        Yii::app()->db->createCommand('delete from {{group_l10ns}} where id ='.$row['id'])->execute();
+        App()->db->createCommand('delete from {{group_l10ns}} where id ='.$row['id'])->execute();
     }
 }
 
@@ -3574,14 +3571,14 @@ function fixLanguageConsistency($sid, $availlangs = '')
         return true; // Survey only has one language
     }
     $baselang = Survey::model()->findByPk($sid)->language;
-    $quotedGroups = Yii::app()->db->quoteTableName('{{groups}}');
+    $quotedGroups = App()->db->quoteTableName('{{groups}}');
     $query = "SELECT * FROM $quotedGroups g JOIN {{group_l10ns}} ls ON ls.gid=g.gid WHERE sid='{$sid}' AND language='{$baselang}'  ";
-    $result = Yii::app()->db->createCommand($query)->query();
+    $result = App()->db->createCommand($query)->query();
     foreach ($result->readAll() as $group) {
         foreach ($langs as $lang) {
 
             $query = "SELECT count(gid) FROM {{group_l10ns}} WHERE gid='{$group['gid']}' AND language='{$lang}'";
-            $gresult = Yii::app()->db->createCommand($query)->queryScalar();
+            $gresult = App()->db->createCommand($query)->queryScalar();
             if ($gresult < 1) {
                 $data = array(
                 'gid' => $group['gid'],
@@ -3589,19 +3586,19 @@ function fixLanguageConsistency($sid, $availlangs = '')
                 'description' => $group['description'],
                 'language' => $lang
                 );
-                Yii::app()->db->createCommand()->insert('{{group_l10ns}}', $data);
+                App()->db->createCommand()->insert('{{group_l10ns}}', $data);
             }
         }
         reset($langs);
     }
 
     $query = "SELECT * FROM {{questions}} q JOIN {{question_l10ns}} ls ON ls.qid=q.qid WHERE sid='{$sid}'";
-    $result = Yii::app()->db->createCommand($query)->query()->readAll();
+    $result = App()->db->createCommand($query)->query()->readAll();
     if (count($result) > 0) {
         foreach ($result as $question) {
             foreach ($langs as $lang) {
                 $query = "SELECT count(qid) FROM {{question_l10ns}} WHERE qid='{$question['qid']}' AND language='{$lang}'";
-                $gresult = Yii::app()->db->createCommand($query)->queryScalar();
+                $gresult = App()->db->createCommand($query)->queryScalar();
                 if ($gresult < 1) {
                     $data = array(
                     'qid' => $question['qid'],
@@ -3609,7 +3606,7 @@ function fixLanguageConsistency($sid, $availlangs = '')
                     'help' => $question['help'],
                     'language' => $lang,
                     );
-                    Yii::app()->db->createCommand()->insert('{{question_l10ns}}', $data);
+                    App()->db->createCommand()->insert('{{question_l10ns}}', $data);
                 }
             }
             reset($langs);
@@ -3620,18 +3617,18 @@ function fixLanguageConsistency($sid, $availlangs = '')
     JOIN {{answer_l10ns}} ls ON ls.aid=a.aid 
     JOIN  {{questions}} q on a.qid=q.qid 
     WHERE language='{$baselang}' and q.sid={$sid}";
-    $result = Yii::app()->db->createCommand($query)->query();
+    $result = App()->db->createCommand($query)->query();
     foreach ($result->readAll() as $answer) {
         foreach ($langs as $lang) {
             $query = "SELECT count(aid) FROM {{answer_l10ns}} WHERE aid={$answer['aid']} AND language='{$lang}'";
-            $gresult = Yii::app()->db->createCommand($query)->queryScalar();
+            $gresult = App()->db->createCommand($query)->queryScalar();
             if ($gresult < 1) {
                 $data = array(
                 'aid' => $answer['aid'],
                 'answer' => $answer['answer'],
                 'language' => $lang
                 );
-                Yii::app()->db->createCommand()->insert('{{answer_l10ns}}', $data);
+                App()->db->createCommand()->insert('{{answer_l10ns}}', $data);
             }
         }
         reset($langs);
@@ -3641,11 +3638,11 @@ function fixLanguageConsistency($sid, $availlangs = '')
     switchMSSQLIdentityInsert('assessments', true);
     Survey::model()->findByPk($sid)->fixInvalidQuestions();
     $query = "SELECT * FROM {{assessments}} WHERE sid='{$sid}' AND language='{$baselang}'";
-    $result = Yii::app()->db->createCommand($query)->query();
+    $result = App()->db->createCommand($query)->query();
     foreach ($result->readAll() as $assessment) {
         foreach ($langs as $lang) {
             $query = "SELECT count(id) FROM {{assessments}} WHERE sid='{$sid}' AND id='{$assessment['id']}' AND language='{$lang}'";
-            $gresult = Yii::app()->db->createCommand($query)->queryScalar();
+            $gresult = App()->db->createCommand($query)->queryScalar();
             if ($gresult < 1) {
                 $data = array(
                 'id' => $assessment['id'],
@@ -3658,7 +3655,7 @@ function fixLanguageConsistency($sid, $availlangs = '')
                 'message' => $assessment['message'],
                 'language' => $lang
                 );
-                Yii::app()->db->createCommand()->insert('{{assessments}}', $data);
+                App()->db->createCommand()->insert('{{assessments}}', $data);
             }
         }
         reset($langs);
@@ -3668,11 +3665,11 @@ function fixLanguageConsistency($sid, $availlangs = '')
 
     switchMSSQLIdentityInsert('quota_languagesettings', true);
     $query = "SELECT * FROM {{quota_languagesettings}} join {{quota}} q on quotals_quota_id=q.id WHERE q.sid='{$sid}' AND quotals_language='{$baselang}'";
-    $result = Yii::app()->db->createCommand($query)->query();
+    $result = App()->db->createCommand($query)->query();
     foreach ($result->readAll() as $qls) {
         foreach ($langs as $lang) {
             $query = "SELECT count(quotals_id) FROM {{quota_languagesettings}} WHERE quotals_quota_id='{$qls['quotals_quota_id']}' AND quotals_language='{$lang}'";
-            $gresult = Yii::app()->db->createCommand($query)->queryScalar();
+            $gresult = App()->db->createCommand($query)->queryScalar();
             if ($gresult < 1) {
                 $data = array(
                 'quotals_quota_id' => $qls['quotals_quota_id'],
@@ -3682,7 +3679,7 @@ function fixLanguageConsistency($sid, $availlangs = '')
                 'quotals_urldescrip' => $qls['quotals_urldescrip'],
                 'quotals_language' => $lang
                 );
-                Yii::app()->db->createCommand()->insert('{{quota_languagesettings}}', $data);
+                App()->db->createCommand()->insert('{{quota_languagesettings}}', $data);
             }
         }
         reset($langs);
@@ -3700,11 +3697,11 @@ function fixLanguageConsistency($sid, $availlangs = '')
  */
 function getLastInsertID($sTableName)
 {
-    $sDBDriver = Yii::app()->db->getDriverName();
+    $sDBDriver = App()->db->getDriverName();
     if ($sDBDriver == 'mysql' || $sDBDriver == 'mysqli') {
-        return Yii::app()->db->getLastInsertID();
+        return App()->db->getLastInsertID();
     } else {
-        return Yii::app()->db->getCommandBuilder()->getLastInsertID($sTableName);
+        return App()->db->getCommandBuilder()->getLastInsertID($sTableName);
     }
 }
 
@@ -3782,7 +3779,7 @@ function getGroupDepsForConditions($sid, $depgid = "all", $targgid = "all", $ind
     if ($targgid != "all") {$targgid = sanitize_int($targgid); $sqltarggid = "AND tq2.gid=$targgid"; }
 
     $baselang = Survey::model()->findByPk($sid)->language;
-    $quotedGroups = Yii::app()->db->quoteTableName('{{groups}}');
+    $quotedGroups = App()->db->quoteTableName('{{groups}}');
     $condquery = "SELECT tg.gid as depgid, ls.group_name as depgpname, "
     . "tg2.gid as targgid, ls2.group_name as targgpname, tq.qid as depqid, tc.cid FROM "
     . "{{conditions}} AS tc, "
@@ -3795,7 +3792,7 @@ function getGroupDepsForConditions($sid, $depgid = "all", $targgid = "all", $ind
     . "AND tq.gid = tg.gid AND tg2.gid = tq2.gid "
     . "AND ls.gid=tg.gid AND ls2.gid=tg2.gid "
     . "AND tq2.qid=tc.cqid AND tq.gid != tg2.gid $sqldepgid $sqltarggid";
-    $condresult = Yii::app()->db->createCommand($condquery)->query()->readAll();
+    $condresult = App()->db->createCommand($condquery)->query()->readAll();
 
     if (count($condresult) > 0) {
         foreach ($condresult as $condrow) {
@@ -3879,7 +3876,7 @@ function getQuestDepsForConditions($sid, $gid = "all", $depqid = "all", $targqid
     FROM {{conditions}} AS tc, {{questions}} AS tq, {{questions}} AS tq2
     WHERE tc.qid = tq.qid AND tq.sid='$sid'
     AND  tq2.qid=tc.cqid $sqlsearchscope $sqlgid $sqldepqid $sqltargqid";
-    $condresult = Yii::app()->db->createCommand($condquery)->query()->readAll();
+    $condresult = App()->db->createCommand($condquery)->query()->readAll();
     if (count($condresult) > 0) {
         foreach ($condresult as $condrow) {
             $depqid = $condrow['depqid'];
@@ -3908,7 +3905,7 @@ function getQuestDepsForConditions($sid, $gid = "all", $depqid = "all", $targqid
 */
 function dbQuoteAll($value)
 {
-    return Yii::app()->db->quoteValue($value);
+    return App()->db->quoteValue($value);
 }
 
 // TMSW Condition->Relevance:  This function is not needed - could replace with a message from EM output.
@@ -3956,7 +3953,7 @@ function checkMoveQuestionConstraintsForConditions($sid, $qid, $newgid = "all")
     $baselang = Survey::model()->findByPk($sid)->language;
 
     // First look for 'my dependencies': questions on which I have set conditions
-    $quotedGroups = Yii::app()->db->quoteTableName('{{groups}}');
+    $quotedGroups = App()->db->quoteTableName('{{groups}}');
     $condquery = "SELECT tq.qid as depqid, tq.gid as depgid, tg.group_order as depgorder, "
     . "tq2.qid as targqid, tq2.gid as targgid, tg2.group_order as targgorder, "
     . "tc.cid FROM "
@@ -3968,7 +3965,7 @@ function checkMoveQuestionConstraintsForConditions($sid, $qid, $newgid = "all")
     . "WHERE tq.language='{$baselang}' AND tq2.language='{$baselang}' AND tc.qid = tq.qid AND tq.sid=$sid "
     . "AND  tq2.qid=tc.cqid AND tg.gid=tq.gid AND tg2.gid=tq2.gid AND tq.qid=$qid ORDER BY tg2.group_order DESC";
 
-    $condresult = Yii::app()->db->createCommand($condquery)->query();
+    $condresult = App()->db->createCommand($condquery)->query();
 
     foreach ($condresult->readAll() as $condrow) {
         // This Question can go up to the minimum GID on the 1st row
@@ -3988,7 +3985,7 @@ function checkMoveQuestionConstraintsForConditions($sid, $qid, $newgid = "all")
     }
 
     // Secondly look for 'questions dependent on me': questions that have conditions on my answers
-    $quotedGroups = Yii::app()->db->quoteTableName('{{groups}}');
+    $quotedGroups = App()->db->quoteTableName('{{groups}}');
     $condquery = "SELECT tq.qid as depqid, tq.gid as depgid, tg.group_order as depgorder, "
     . "tq2.qid as targqid, tq2.gid as targgid, tg2.group_order as targgorder, "
     . "tc.cid FROM {{conditions}} AS tc, "
@@ -3999,7 +3996,7 @@ function checkMoveQuestionConstraintsForConditions($sid, $qid, $newgid = "all")
     . "WHERE tq.language='{$baselang}' AND tq2.language='{$baselang}' AND tc.qid = tq.qid AND tq.sid=$sid "
     . "AND  tq2.qid=tc.cqid AND tg.gid=tq.gid AND tg2.gid=tq2.gid AND tq2.qid=$qid ORDER BY tg.group_order";
 
-    $condresult = Yii::app()->db->createCommand($condquery)->query();
+    $condresult = App()->db->createCommand($condquery)->query();
 
     foreach ($condresult->readAll() as $condrow) {
         // This Question can go down to the maximum GID on the 1st row
@@ -4028,11 +4025,11 @@ function getUserGroupList()
 {
     $sQuery = "SELECT distinct a.ugid, a.name, a.owner_id FROM {{user_groups}} AS a LEFT JOIN {{user_in_groups}} AS b ON a.ugid = b.ugid WHERE 1=1 ";
     if (!Permission::model()->hasGlobalPermission('superadmin', 'read')) {
-        $sQuery .= "AND uid = ".Yii::app()->session['loginID'];
+        $sQuery .= "AND uid = ".App()->session['loginID'];
     }
     $sQuery .= " ORDER BY name";
 
-    $sresult = Yii::app()->db->createCommand($sQuery)->query(); //Checked
+    $sresult = App()->db->createCommand($sQuery)->query(); //Checked
     if (!$sresult) {return "Database Error"; }
     $aGroupNames = [];
     foreach ($sresult->readAll() as $row) {
@@ -4063,7 +4060,7 @@ function getUserGroupList()
 */
 function modifyDatabase($sqlfile = '', $sqlstring = '')
 {
-    Yii::app()->loadHelper('database');
+    App()->loadHelper('database');
 
 
     global $siteadminemail;
@@ -4100,16 +4097,16 @@ function modifyDatabase($sqlfile = '', $sqlstring = '')
             if (substr($line, $length - 1, 1) == ';') {
                 $line = substr($line, 0, $length - 1); // strip ;
                 $command .= $line;
-                $command = str_replace('prefix_', Yii::app()->db->tablePrefix, $command); // Table prefixes
-                $command = str_replace('$defaultuser', Yii::app()->getConfig('defaultuser'), $command);
-                $command = str_replace('$defaultpass', hash('sha256', Yii::app()->getConfig('defaultpass')), $command);
+                $command = str_replace('prefix_', App()->db->tablePrefix, $command); // Table prefixes
+                $command = str_replace('$defaultuser', App()->getConfig('defaultuser'), $command);
+                $command = str_replace('$defaultpass', hash('sha256', App()->getConfig('defaultpass')), $command);
                 $command = str_replace('$siteadminname', $siteadminname, $command);
                 $command = str_replace('$siteadminemail', $siteadminemail, $command);
-                $command = str_replace('$defaultlang', Yii::app()->getConfig('defaultlang'), $command);
-                $command = str_replace('$databasetabletype', Yii::app()->db->getDriverName(), $command);
+                $command = str_replace('$defaultlang', App()->getConfig('defaultlang'), $command);
+                $command = str_replace('$databasetabletype', App()->db->getDriverName(), $command);
 
                 try
-                {   Yii::app()->db->createCommand($command)->query(); //Checked
+                {   App()->db->createCommand($command)->query(); //Checked
                     $command = htmlspecialchars($command);
                     $modifyoutput .= ". ";
                 } catch (CDbException $e) {
@@ -4173,17 +4170,17 @@ function getLabelSets($languages = null)
 function getHeader($meta = false)
 {
     /* Todo : move this to layout/public.html */
-    $surveyid = Yii::app()->session['LEMsid'];
+    $surveyid = App()->session['LEMsid'];
     $oSurvey = Survey::model()->findByPk($surveyid);
-    Yii::app()->loadHelper('surveytranslator');
+    App()->loadHelper('surveytranslator');
 
-    // Set Langage // TODO remove one of the Yii::app()->session see bug #5901
-    if (Yii::app()->session['survey_'.$surveyid]['s_lang']) {
-        $languagecode = Yii::app()->session['survey_'.$surveyid]['s_lang'];
+    // Set Langage // TODO remove one of the App()->session see bug #5901
+    if (App()->session['survey_'.$surveyid]['s_lang']) {
+        $languagecode = App()->session['survey_'.$surveyid]['s_lang'];
     } elseif (isset($surveyid) && $surveyid && $oSurvey) {
         $languagecode = $oSurvey->language;
     } else {
-        $languagecode = Yii::app()->getConfig('defaultlang');
+        $languagecode = App()->getConfig('defaultlang');
     }
     $header = "<!DOCTYPE html>\n";
     $class = "no-js $languagecode";
@@ -4198,7 +4195,7 @@ function getHeader($meta = false)
     }
     $header .= " class=\"{$class}\">\n";
     $header .= "\t<head>\n";
-    Yii::app()->clientScript->registerScriptFile(Yii::app()->getConfig("generalscripts").'nojs.js', CClientScript::POS_HEAD);
+    App()->clientScript->registerScriptFile(App()->getConfig("generalscripts").'nojs.js', CClientScript::POS_HEAD);
     if ($meta) {
             $header .= $meta;
     }
@@ -4261,22 +4258,22 @@ function getSurveyUserList($bIncludeSuperAdmins = true, $surveyid)
         //   $sSurveyIDQuery.='and superadmin=0 ';
     }
     $sSurveyIDQuery .= 'ORDER BY a.users_name';
-    $oSurveyIDResult = Yii::app()->db->createCommand($sSurveyIDQuery)->query(); //Checked
+    $oSurveyIDResult = App()->db->createCommand($sSurveyIDQuery)->query(); //Checked
     $aSurveyIDResult = $oSurveyIDResult->readAll();
 
     $surveyselecter = "";
     $authorizedUsersList = [];
 
-    if (Yii::app()->getConfig('usercontrolSameGroupPolicy') == true) {
+    if (App()->getConfig('usercontrolSameGroupPolicy') == true) {
         $authorizedUsersList = getUserList('onlyuidarray');
     }
 
     $svexist = false;
     foreach ($aSurveyIDResult as $sv) {
-        if (Yii::app()->getConfig('usercontrolSameGroupPolicy') == false ||
+        if (App()->getConfig('usercontrolSameGroupPolicy') == false ||
             in_array($sv['uid'], $authorizedUsersList)) {
             $surveyselecter .= "<option";
-            $surveyselecter .= " value='{$sv['uid']}'>".\CHtml::encode($sv['users_name'])." ".\CHtml::encode($sv['full_name'])."</option>\n";
+            $surveyselecter .= " value='{$sv['uid']}'>". CHtml::encode($sv['users_name'])." ". CHtml::encode($sv['full_name'])."</option>\n";
             $svexist = true;
         }
     }
@@ -4309,11 +4306,11 @@ function getSurveyUserGroupList($outputformat = 'htmloptions', $surveyid)
     LEFT JOIN (SELECT * FROM {{permissions}}
     WHERE entity_id = {$surveyid} and entity='survey') AS c ON b.uid = c.uid WHERE c.uid IS NULL
     ) AS d ON a.ugid = d.ugid GROUP BY a.ugid, a.name HAVING MAX(d.ugid) IS NOT NULL";
-    $surveyidresult = Yii::app()->db->createCommand($surveyidquery)->query(); //Checked
+    $surveyidresult = App()->db->createCommand($surveyidquery)->query(); //Checked
     $aResult = $surveyidresult->readAll();
 
     $authorizedGroupsList = [];
-    if (Yii::app()->getConfig('usercontrolSameGroupPolicy') == true) {
+    if (App()->getConfig('usercontrolSameGroupPolicy') == true) {
         $authorizedGroupsList = getUserGroupList();
     }
 
@@ -4321,7 +4318,7 @@ function getSurveyUserGroupList($outputformat = 'htmloptions', $surveyid)
     $surveyselecter = "";
     $simpleugidarray = [];
     foreach ($aResult as $sv) {
-        if (Yii::app()->getConfig('usercontrolSameGroupPolicy') == false ||
+        if (App()->getConfig('usercontrolSameGroupPolicy') == false ||
         in_array($sv['ugid'], $authorizedGroupsList)) {
             $surveyselecter .= "<option";
             $surveyselecter .= " value='{$sv['ugid']}'>{$sv['name']}</option>\n";
@@ -4353,7 +4350,7 @@ function getSurveyUserGroupList($outputformat = 'htmloptions', $surveyid)
 */
 function fixSubquestions()
 {
-    $surveyidresult = Yii::app()->db->createCommand()
+    $surveyidresult = App()->db->createCommand()
     ->select('sq.qid, q.gid , q.type ')
     ->from('{{questions}} sq')
     ->join('{{questions}} q', 'sq.parent_qid=q.qid')
@@ -4367,7 +4364,7 @@ function fixSubquestions()
         foreach ($aRecords as $sv) {
             if ($aQuestionTypes[$sv['type']]['subquestions']) {
                 // If the question type allows subquestions, set the type in each subquestion
-                Yii::app()->db->createCommand("update {{questions}} set type='{$sv['type']}', gid={$sv['gid']} where qid={$sv['qid']}")->execute();
+                App()->db->createCommand("update {{questions}} set type='{$sv['type']}', gid={$sv['gid']} where qid={$sv['qid']}")->execute();
             } else {
                 // If the question type doesn't allow subquestions, delete each subquestion
                 // Model is used because more tables are involved.
@@ -4377,7 +4374,7 @@ function fixSubquestions()
                 }
             }
         }
-        $surveyidresult = Yii::app()->db->createCommand()
+        $surveyidresult = App()->db->createCommand()
         ->select('sq.qid, q.gid , q.type ')
         ->from('{{questions}} sq')
         ->join('{{questions}} q', 'sq.parent_qid=q.qid')
@@ -4524,8 +4521,8 @@ function getIPAddress()
 */
 function getBrowserLanguage()
 {
-    $sLanguage = Yii::app()->getRequest()->getPreferredLanguage();
-    Yii::app()->loadHelper("surveytranslator");
+    $sLanguage = App()->getRequest()->getPreferredLanguage();
+    App()->loadHelper("surveytranslator");
     $aLanguages = getLanguageData();
     if (!isset($aLanguages[$sLanguage])) {
         $sLanguage = str_replace('_', '-', $sLanguage);
@@ -4537,7 +4534,7 @@ function getBrowserLanguage()
         if (!isset($aLanguages[$sLanguage])) {
             $sLanguage = substr($sLanguage, 0, strpos($sLanguage, '-'));
             if (!isset($aLanguages[$sLanguage])) {
-                $sLanguage = Yii::app()->getConfig('defaultlang');
+                $sLanguage = App()->getConfig('defaultlang');
             }
         }
     }
@@ -4603,7 +4600,7 @@ function humanFilesize($bytes, $decimals = 2)
     $factor = 2;
     $string = sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)).@$sz[$factor];
     $aLangData = getLanguageData();
-    $radix = getRadixPointData($aLangData[Yii::app()->session['adminlang']]['radixpoint']);
+    $radix = getRadixPointData($aLangData[App()->session['adminlang']]['radixpoint']);
     return str_replace('.', $radix['separator'], $string);
 }
 
@@ -4701,7 +4698,7 @@ function regenerateCSRFToken()
     // Expire the CSRF cookie
     $cookie = new CHttpCookie('YII_CSRF_TOKEN', '');
     $cookie->expire = time() - 3600;
-    Yii::app()->request->cookies['YII_CSRF_TOKEN'] = $cookie;
+    App()->request->cookies['YII_CSRF_TOKEN'] = $cookie;
 }
 
 /**
@@ -4766,7 +4763,7 @@ function isAssociativeArray($array){
 */
 function createRandomTempDir($dir=null, $prefix = '', $mode = 0700)
 {
-    $sDir = (empty($dir)) ? Yii::app()->getConfig('tempdir') : get_absolute_path ($dir);
+    $sDir = (empty($dir)) ? App()->getConfig('tempdir') : get_absolute_path ($dir);
 
     if (substr($sDir, -1) != DIRECTORY_SEPARATOR) {
         $sDir .= DIRECTORY_SEPARATOR;
@@ -4830,7 +4827,7 @@ function crypto_rand_secure($min, $max) {
  */
 function isZipBomb($zip_filename)
 {
-    return ( get_zip_originalsize($zip_filename) >  Yii::app()->getConfig('maximum_unzipped_size') );
+    return ( get_zip_originalsize($zip_filename) >  App()->getConfig('maximum_unzipped_size') );
 }
 
 /**
@@ -4855,7 +4852,7 @@ function get_zip_originalsize($filename) {
         return $size;
     }else{
         if ( YII_DEBUG ){
-            Yii::app()->setFlashMessage("Warning! The PHP Zip extension is not installed on this server. You're not protected from ZIP bomb attacks.", 'error');
+            App()->setFlashMessage("Warning! The PHP Zip extension is not installed on this server. You're not protected from ZIP bomb attacks.", 'error');
         }
     }
 
@@ -4888,15 +4885,15 @@ function safecount($element)
 */
 function switchMSSQLIdentityInsert($table, $state)
 {
-    if (in_array(Yii::app()->db->getDriverName(), array('mssql', 'sqlsrv', 'dblib'))) {
+    if (in_array(App()->db->getDriverName(), array('mssql', 'sqlsrv', 'dblib'))) {
         if ($state === true) {
             // This needs to be done directly on the PDO object because when using CdbCommand or similar
             // it won't have any effect
-            Yii::app()->db->pdoInstance->exec('SET IDENTITY_INSERT '.Yii::app()->db->tablePrefix.$table.' ON');
+            App()->db->pdoInstance->exec('SET IDENTITY_INSERT '.App()->db->tablePrefix.$table.' ON');
         } else {
             // This needs to be done directly on the PDO object because when using CdbCommand or similar
             // it won't have any effect
-            Yii::app()->db->pdoInstance->exec('SET IDENTITY_INSERT '.Yii::app()->db->tablePrefix.$table.' OFF');
+            App()->db->pdoInstance->exec('SET IDENTITY_INSERT '.App()->db->tablePrefix.$table.' OFF');
         }
     }
 }
@@ -4905,7 +4902,7 @@ function switchMSSQLIdentityInsert($table, $state)
  * Helper to filter the contents of a .zip file uploaded into the file manager
  */
 function resourceExtractFilter($p_event, &$p_header) {
-    $aAllowExtensions = Yii::app()->getConfig('allowedfileuploads');
+    $aAllowExtensions = App()->getConfig('allowedfileuploads');
     $info = pathinfo($p_header['filename']);
     if ($p_header['folder'] || !isset($info['extension']) || in_array($info['extension'], $aAllowExtensions)) {
         return 1;

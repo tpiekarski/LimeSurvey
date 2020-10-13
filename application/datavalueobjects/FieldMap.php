@@ -26,7 +26,6 @@ class FieldMap
     public function __construct(array $items = [])
     {
         foreach ($items as $item) {
-            var_dump($item);
             $this->currentField = new Field($item);
 
             $answerTableExists = isset($item['answertabledefinition']);

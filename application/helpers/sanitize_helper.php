@@ -90,6 +90,10 @@ $magic_quotes = (bool) @ini_get('magic_quotes_gpc');
 if ($magic_quotes == true) { define("MAGIC_QUOTES", 1); } else { define("MAGIC_QUOTES", 0); }
 
 // addslashes wrapper to check for gpc_magic_quotes - gz
+/**
+ * @param $string
+ * @return string
+ */
 function nice_addslashes($string)
 {
     // if magic quotes is on the string is already quoted, just return it
@@ -109,6 +113,13 @@ function nice_addslashes($string)
  *     $string - The string to sanitize.
  *     $force_lowercase - Force the string to lowercase?
  *     $alphanumeric - If set to *true*, will remove all non-alphanumeric characters.
+ */
+/**
+ * @param $filename
+ * @param bool $force_lowercase
+ * @param bool $alphanumeric
+ * @param bool $beautify
+ * @return string|string[]
  */
 function sanitize_filename($filename, $force_lowercase = true, $alphanumeric = false, $beautify = true)
 {
@@ -170,8 +181,6 @@ function beautify_filename($filename)
     return $filename;
 }
 
-
-
 /**
  * Function: sanitize_dirname
  * sanitizes a string that will be used as a directory name
@@ -181,7 +190,12 @@ function beautify_filename($filename)
  *     $force_lowercase - Force the string to lowercase?
  *     $alphanumeric - If set to *true*, will remove all non-alphanumeric characters.
  */
-
+/**
+ * @param $string
+ * @param bool $force_lowercase
+ * @param bool $alphanumeric
+ * @return string|string[]
+ */
 function sanitize_dirname($string, $force_lowercase = false, $alphanumeric = false)
 {
     $string = str_replace(".", "", $string);
@@ -190,18 +204,30 @@ function sanitize_dirname($string, $force_lowercase = false, $alphanumeric = fal
 
 
 // paranoid sanitization -- only let the alphanumeric set through
+/**
+ * @param $string
+ * @param string $min
+ * @param string $max
+ * @return bool|string|string[]|null
+ */
 function sanitize_paranoid_string($string, $min = '', $max = '')
 {
     if (isset($string)) {
-        $string = preg_replace("/[^_.a-zA-Z0-9]/", "", $string);
-        $len = strlen($string);
+        $result = preg_replace("/[^_.a-zA-Z0-9]/", "", $string);
+        $len = strlen($result);
         if ((($min != '') && ($len < $min)) || (($max != '') && ($len > $max))) {
-                return false;
+            $result = false;
         }
-        return $string;
     }
+    return $result;
 }
 
+/**
+ * @param $string
+ * @param string $min
+ * @param string $max
+ * @return bool|string|string[]|null
+ */
 function sanitize_cquestions($string, $min = '', $max = '')
 {
     if (isset($string)) {
@@ -215,6 +241,12 @@ function sanitize_cquestions($string, $min = '', $max = '')
 }
 
 // sanitize a string in prep for passing a single argument to system() (or similar)
+/**
+ * @param $string
+ * @param string $min
+ * @param string $max
+ * @return bool|string
+ */
 function sanitize_system_string($string, $min = '', $max = '')
 {
     if (isset($string)) {
@@ -232,6 +264,10 @@ function sanitize_system_string($string, $min = '', $max = '')
     }
 }
 
+/**
+ * @param $string
+ * @return string|string[]
+ */
 function sanitize_xss_string($string)
 {
     if (isset($string)) {
@@ -240,9 +276,11 @@ function sanitize_xss_string($string)
     }
 }
 
-
-
 // sanitize a string for SQL input (simple slash out quotes and slashes)
+/**
+ * @param $string
+ * @return string|string[]
+ */
 function sanitize_sql_db_tablename($string)
 {
     $bad = array('*', '^', '&', '\'', '-', ';', '\"', '(', ')', '%', '$', '?');
@@ -250,6 +288,12 @@ function sanitize_sql_db_tablename($string)
 }
 
 // sanitize a string for SQL input (simple slash out quotes and slashes)
+/**
+ * @param $string
+ * @param string $min
+ * @param string $max
+ * @return bool|string|string[]|null
+ */
 function sanitize_ldap_string($string, $min = '', $max = '')
 {
     $pattern = '/(\)|\(|\||&)/';
@@ -260,8 +304,11 @@ function sanitize_ldap_string($string, $min = '', $max = '')
     return preg_replace($pattern, '', $string);
 }
 
-
 // sanitize a string for HTML (make sure nothing gets interpretted!)
+/**
+ * @param $string
+ * @return string|string[]|null
+ */
 function sanitize_html_string($string)
 {
     $pattern[0] = '/\&/';
@@ -290,6 +337,12 @@ function sanitize_html_string($string)
 }
 
 // make int int!
+/**
+ * @param $integer
+ * @param string $min
+ * @param string $max
+ * @return bool|string|string[]|null
+ */
 function sanitize_int($integer, $min = '', $max = '')
 {
     $int = preg_replace("#[^0-9]#", "", $integer);
@@ -318,6 +371,10 @@ function sanitize_user($string)
 // sanitize a username
 // TODO: define the exact format of the username
 // allow for instance 0-9a-zA-Z@_-.
+/**
+ * @param $string
+ * @return string
+ */
 function sanitize_userfullname($string)
 {
     $username_length = 50;
@@ -325,6 +382,10 @@ function sanitize_userfullname($string)
     return $string;
 }
 
+/**
+ * @param $string
+ * @return string
+ */
 function sanitize_labelname($string)
 {
     $labelname_length = 100;
@@ -333,6 +394,12 @@ function sanitize_labelname($string)
 }
 
 // make float float!
+/**
+ * @param $float
+ * @param string $min
+ * @param string $max
+ * @return bool|float|string
+ */
 function sanitize_float($float, $min = '', $max = '')
 {
     $float = str_replace(',', '.', $float);
@@ -354,8 +421,14 @@ function sanitize_float($float, $min = '', $max = '')
     }
 }
 
-
 // glue together all the other functions
+/**
+ * @param $input
+ * @param $flags
+ * @param string $min
+ * @param string $max
+ * @return bool|float|string|string[]|null
+ */
 function sanitize($input, $flags, $min = '', $max = '')
 {
     if ($flags & PARANOID) {
@@ -379,6 +452,12 @@ function sanitize($input, $flags, $min = '', $max = '')
     return $input;
 }
 
+/**
+ * @param $input
+ * @param string $min
+ * @param string $max
+ * @return bool
+ */
 function check_paranoid_string($input, $min = '', $max = '')
 {
     if ($input != sanitize_paranoid_string($input, $min, $max)) {
@@ -387,6 +466,12 @@ function check_paranoid_string($input, $min = '', $max = '')
     return true;
 }
 
+/**
+ * @param $input
+ * @param string $min
+ * @param string $max
+ * @return bool
+ */
 function check_int($input, $min = '', $max = '')
 {
     if ($input != sanitize_int($input, $min, $max)) {
@@ -395,6 +480,12 @@ function check_int($input, $min = '', $max = '')
     return true;
 }
 
+/**
+ * @param $input
+ * @param string $min
+ * @param string $max
+ * @return bool
+ */
 function check_float($input, $min = '', $max = '')
 {
     if ($input != sanitize_float($input, $min, $max)) {
@@ -403,6 +494,12 @@ function check_float($input, $min = '', $max = '')
     return true;
 }
 
+/**
+ * @param $input
+ * @param string $min
+ * @param string $max
+ * @return bool
+ */
 function check_html_string($input, $min = '', $max = '')
 {
     if ($input != sanitize_html_string($input)) {
@@ -411,7 +508,12 @@ function check_html_string($input, $min = '', $max = '')
     return true;
 }
 
-
+/**
+ * @param $input
+ * @param string $min
+ * @param string $max
+ * @return bool
+ */
 function check_ldap_string($input, $min = '', $max = '')
 {
     // FIXME undefined function sanitize_string
@@ -421,6 +523,12 @@ function check_ldap_string($input, $min = '', $max = '')
     return true;
 }
 
+/**
+ * @param $input
+ * @param string $min
+ * @param string $max
+ * @return bool
+ */
 function check_system_string($input, $min = '', $max = '')
 {
     if ($input != sanitize_system_string($input, $min, $max)) {
@@ -468,6 +576,10 @@ function check($input, $flags, $min = '', $max = '')
     return true;
 }
 
+/**
+ * @param $codetosanitize
+ * @return string|string[]|null
+ */
 function sanitize_languagecode($codetosanitize)
 {
     return preg_replace('/[^a-z0-9-]/i', '', $codetosanitize);
@@ -483,7 +595,12 @@ function sanitize_languagecodeS($codestringtosanitize)
     return implode(" ", $codearray);
 }
 
-
+/**
+ * @param $integer
+ * @param string $min
+ * @param string $max
+ * @return bool|int
+ */
 function sanitize_signedint($integer, $min = '', $max = '')
 {
     $int = (int) $integer;

@@ -51,8 +51,9 @@ define('CHECKED', ' checked="checked"');
 define('SELECTED', ' selected="selected"');
 
 /**
-* setNoAnswerMode
-*/
+ * setNoAnswerMode
+ * @param $thissurvey
+ */
 function setNoAnswerMode($thissurvey)
 {
     if (App()->getConfig('shownoanswer') == 2) {
@@ -71,39 +72,41 @@ function setNoAnswerMode($thissurvey)
 }
 
 /**
-* This function returns an array containing the "question/answer" html display
-* and a list of the question/answer fieldnames associated. It is called from
-* question.php, group.php, survey.php or preview.php
-*
-* @param array $ia Details of $ia can be found at top of this file
-* @return array Array like [array $qanda, array $inputnames] where
-*               $qanda has elements [
-*                 $qtitle (question_text) : array [
-*                        all : string; complete HTML?; all has been added for backwards compatibility with templates that use question_start.pstpl (now redundant)
-*                        'text'               => $qtitle, question?? $ia[3]?
-*                        'code'               => $ia[2] or title??
-*                        'number'             => $number
-*                        'help'               => ''
-*                        'mandatory'          => ''
-*                        man_message : string; message when mandatory is not answered
-*                        'valid_message'      => ''
-*                        file_valid_message : string; only relevant for file upload
-*                        'class'              => ''
-*                        'man_class'          => ''
-*                        'input_error_class'  => ''              // provides a class.
-*                        'essentials'         => ''
-*                 ]
-*                 $answer ?
-*                 'help' : string
-*                 $display : ?
-*                 $qid  : integer
-*                 $ia[2] = title;
-*                 $ia[5] = group id : int
-*                 $ia[1] = fieldname : string
-*               ]
-*               and $inputnames is ? used for hiddenfieldnames and upload file?
-*
-*/
+ * This function returns an array containing the "question/answer" html display
+ * and a list of the question/answer fieldnames associated. It is called from
+ * question.php, group.php, survey.php or preview.php
+ *
+ * @param array $ia Details of $ia can be found at top of this file
+ * @return array Array like [array $qanda, array $inputnames] where
+ *               $qanda has elements [
+ *                 $qtitle (question_text) : array [
+ *                        all : string; complete HTML?; all has been added for backwards compatibility with templates that use question_start.pstpl (now redundant)
+ *                        'text'               => $qtitle, question?? $ia[3]?
+ *                        'code'               => $ia[2] or title??
+ *                        'number'             => $number
+ *                        'help'               => ''
+ *                        'mandatory'          => ''
+ *                        man_message : string; message when mandatory is not answered
+ *                        'valid_message'      => ''
+ *                        file_valid_message : string; only relevant for file upload
+ *                        'class'              => ''
+ *                        'man_class'          => ''
+ *                        'input_error_class'  => ''              // provides a class.
+ *                        'essentials'         => ''
+ *                 ]
+ *                 $answer ?
+ *                 'help' : string
+ *                 $display : ?
+ *                 $qid  : integer
+ *                 $ia[2] = title;
+ *                 $ia[5] = group id : int
+ *                 $ia[1] = fieldname : string
+ *               ]
+ *               and $inputnames is ? used for hiddenfieldnames and upload file?
+ *
+ * @throws CException
+ * @throws EmCacheException
+ */
 function retrieveAnswers($ia)
 {
     //globalise required config variables
@@ -152,7 +155,6 @@ function retrieveAnswers($ia)
     $oRenderer = $oQuestion->getRenderererObject($ia);
     $values = $oRenderer->render();
 
-
     if (isset($values)) {
         //Break apart $values array returned from switch
         //$answer is the html code to be printed
@@ -168,7 +170,7 @@ function retrieveAnswers($ia)
     $qtitle .= $mandatory_msg;
     $question_text['man_message'] = $mandatory_msg;
 
-    $_vshow = (!isset($aQuestionAttributes['hide_tip']) || $aQuestionAttributes['hide_tip'] == 0) ?true:false; // whether should initially be visible - TODO should also depend upon 'hidetip'?
+    $_vshow = !isset($aQuestionAttributes['hide_tip']) || $aQuestionAttributes['hide_tip'] == 0; // whether should initially be visible - TODO should also depend upon 'hidetip'?
 
     list($validation_msg, $isValid) = validation_message($ia, $_vshow);
 
