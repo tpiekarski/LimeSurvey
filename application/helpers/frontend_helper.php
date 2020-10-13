@@ -903,11 +903,15 @@ function randomizationGroupsAndQuestions($surveyid, $preview = false, FieldMap $
 
     $fieldmap = (empty($fieldmap)) ? $_SESSION['survey_'.$surveyid]['fieldmap'] : $fieldmap;
 
+    var_dump('Before List');
     var_dump($fieldmap);
-
+    var_dump('-----');
     list($fieldmap, $randomized1) = randomizationGroup($surveyid, $fieldmap, $preview); // Randomization groups for groups
     list($fieldmap, $randomized2) = randomizationQuestion($surveyid, $fieldmap, $preview); // Randomization groups for questions
 
+    var_dump($fieldmap);
+    var_dump('After List');
+    var_dump('-----');
     $randomized = $randomized1 || $randomized2;
     $_SESSION['survey_' . $surveyid]['randomized'] = $randomized;
 
@@ -943,6 +947,7 @@ function randomizationGroup($surveyid, FieldMap $fieldmap, $preview)
     $criteria->addColumnCondition(array('sid' => $surveyid));
     $criteria->addCondition("randomization_group != ''");
 
+    // TODO: Move this to Repository.
     $oData = QuestionGroup::model()->findAll($criteria);
 
     foreach ($oData as $aGroup) {
@@ -1013,11 +1018,11 @@ function randomizationGroup($surveyid, FieldMap $fieldmap, $preview)
 /**
  * Randomization group for questions
  * @param int $surveyid
- * @param array $fieldmap
+ * @param FieldMap $fieldmap
  * @param boolean $preview
  * @return array ($fieldmap, $randomized)
  */
-function randomizationQuestion($surveyid, array $fieldmap, $preview)
+function randomizationQuestion($surveyid, FieldMap $fieldmap, $preview)
 {
     $randomized   = false;
     $randomGroups = array();
@@ -1052,17 +1057,20 @@ function randomizationQuestion($surveyid, array $fieldmap, $preview)
         }
 
         // Loop through the fieldmap and swap each question as they come up
-        foreach ($fieldmap as $fieldkey => $fieldval) {
+        /*
+         * @var Field $field
+         */
+        foreach ($fieldmap->getList() as $field) {
             $found = 0;
 
             foreach ($randomGroups as $gkey => $gval) {
                 // We found a qid that is in the randomization group
-                if (isset($fieldval['qid']) && in_array($fieldval['qid'], $oldQuestOrder[$gkey])) {
+                if (in_array($field->getQuestionid(), $oldQuestOrder[$gkey])) {
                     // Get the swapped question
-                    $idx = array_search($fieldval['qid'], $oldQuestOrder[$gkey]);
+                    $idx = array_search($field->getQuestionid(), $oldQuestOrder[$gkey]);
 
-                    foreach ($fieldmap as $key => $field) {
-                        if (isset($field['qid']) && $field['qid'] == $newQuestOrder[$gkey][$idx]) {
+                    foreach ($fieldmap->getList() as $field) {
+                        if (isset($field->getQuestionid()) && $field->getQuestionid() == $newQuestOrder[$gkey][$idx]) {
                             $field['random_gid'] = $fieldval['gid']; // It is possible to swap to another group
                             $copyFieldMap[$key]  = $field;
                         }
@@ -1100,7 +1108,6 @@ function finalizeRandomization($fieldmap)
     $copyFieldMap = array();
 
     foreach ($fieldmap as $key => $val) {
-
         if ($val['gid'] != '') {
 
             if (isset($val['random_gid'])) {
@@ -1142,7 +1149,6 @@ function testIfTokenIsValid(array $subscenarios, array $thissurvey, array $aEnte
 {
     $FlashError = '';
     if (!$subscenarios['tokenValid']) {
-
         //Check if there is a clienttoken set
         if ((!isset($clienttoken) || $clienttoken == "")) {
             if (isset($thissurvey) && $thissurvey['allowregister'] == "Y") {
@@ -1199,7 +1205,14 @@ function getRenderWay($renderToken, $renderCaptcha)
  * @param string $sTemplateViewPath
  * @param array $aEnterTokenData
  * @param int $surveyid
+ * @param null $aSurveyInfo
  * @return void
+ * @throws CException
+ * @throws CHttpException
+ * @throws Throwable
+ * @throws Twig_Error_Loader
+ * @throws Twig_Error_Syntax
+ * @throws WrongTemplateVersionException
  */
 function renderRenderWayForm($renderWay, array $scenarios, $sTemplateViewPath, $aEnterTokenData, $surveyid, $aSurveyInfo=null)
 {
@@ -1258,7 +1271,7 @@ function renderRenderWayForm($renderWay, array $scenarios, $sTemplateViewPath, $
  */
 function resetAllSessionVariables($surveyid)
 {
-    Yii:app()->session->regenerateID(true);
+    App()->session->regenerateID(true);
     unset($_SESSION['survey_'.$surveyid]['grouplist']);
     unset($_SESSION['survey_'.$surveyid]['fieldarray']);
     unset($_SESSION['survey_'.$surveyid]['insertarray']);
@@ -1341,8 +1354,6 @@ function renderError($sTitle = '', $sMessage, $thissurvey, $sTemplateViewPath)
 {
     // Template settings
     $surveyid = $thissurvey['sid'];
-    //$oTemplate         = Template::model()->getInstance('', $surveyid);
-    //$oTemplate->registerAssets();
 
     $aError = array();
     $aError['title']      = ($sTitle != '') ? $sTitle : gT("This survey cannot be tested or completed for the following reason(s):");
@@ -1358,6 +1369,7 @@ function renderError($sTitle = '', $sMessage, $thissurvey, $sTemplateViewPath)
  */
 function getNavigatorDatas()
 {
+    // TODO: Remove Globals.
     global $surveyid, $thissurvey;
 
     $aNavigator = array();
@@ -1579,7 +1591,7 @@ function doAssessment($surveyid, $onlyCurrent = true)
         'order' => 'scope,id', // No real order in assessment, here : group first (why ?) and by creation
         'params' => array(':sid' => $surveyid,':language' => $currentLanguage)
     ));
-    if(!empty($aoAssessements)) {
+    if (!empty($aoAssessements)) {
         foreach ($aoAssessements as $oAssessement) {
             if ($oAssessement->scope == "G") {
                 /* send only current valid assessments */
@@ -1665,6 +1677,7 @@ function UpdateGroupList($surveyid, $language)
 */
 function updateFieldArray()
 {
+    // TODO: Remove Global
     global $surveyid;
 
     if (isset($_SESSION['survey_'.$surveyid]['fieldarray'])) {
@@ -1708,19 +1721,15 @@ function checkCompletedQuota($surveyid, $return = false)
         $aMatchedQuotas = array();
         /** @var Quota[] $aQuotas */
         $aQuotas = Quota::model()->findAllByAttributes(array('sid' => $surveyid));
-        // if(!$aQuotasInfo || empty($aQuotaInfos)) {
         if (!$aQuotas || empty($aQuotas)) {
             return $aMatchedQuotas;
         }
 
         // OK, we have some quota, then find if this $_SESSION have some set
-        // foreach ($aQuotasInfos as $aQuotaInfo)
         foreach ($aQuotas as $oQuota) {
-            // if(!$aQuotaInfo['active']) {
             if (!$oQuota->active) {
                 continue;
             }
-            // if(count($aQuotaInfo['members'])===0) {
             if (count($oQuota->quotaMembers) === 0) {
                 continue;
             }
@@ -1928,6 +1937,7 @@ function getReferringUrl()
  */
 function display_first_page($thissurvey, $aSurveyInfo)
 {
+    // TODO: Remove Globals.
     global $token, $surveyid;
 
     $thissurvey                 = $aSurveyInfo;
@@ -2005,7 +2015,6 @@ function resetQuestionTimers($surveyid)
 {
     App()->clientScript->registerScript(
         'resetQuestionTimers',
-        //'LSvar.bResetQuestionTimers=true;',
         "resetQuestionTimers({$surveyid})",
         LSYii_ClientScript::POS_BEGIN
     );
@@ -2065,7 +2074,7 @@ function getMove()
     /* @deprecated since we use button and not input with different value. */
     foreach ($aAcceptedMove as $sAccepteMove) {
         if (App()->request->getParam($sAccepteMove)) {
-                    $move = $sAccepteMove;
+            $move = $sAccepteMove;
         }
     }
     /* default move (user don't click on a button, but use enter in a input:text or a select */
