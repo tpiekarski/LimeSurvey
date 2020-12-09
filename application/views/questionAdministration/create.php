@@ -58,7 +58,7 @@ $this->renderPartial(
             <!-- "Replace" input -->
             <div v-if="newOrReplace === 'replace'">
                 <p id="laname" class="label-name-wrapper">
-                    <replace-input />
+                    <label-set-select/>
                 </p>
             </div>
 
@@ -71,7 +71,9 @@ $this->renderPartial(
     <script>
         // Register component replace-input globally.
         // Can also be imported as a module.
-        Vue.component('replace-input', {
+        // Web component ~= Yii widget.
+        // Vue template ~= Twig + reactivity.
+        Vue.component('label-set-select', {
             data: () => {
                 return {
                     options: []
