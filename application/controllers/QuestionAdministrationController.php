@@ -149,6 +149,14 @@ class QuestionAdministrationController extends LSBaseController
         App()->session['FileManagerContent'] = "edit:survey:{$question->sid}";
         initKcfinder();
 
+        // Register CDN version of Vue 2.
+        // Only for dev. For prod, use npm package with bundling etc.
+        // @see https://vuejs.org/v2/guide/installation.html#CDN
+        Yii::app()->clientScript->registerScriptFile(
+            'https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js',
+            CClientScript::POS_HEAD
+        );
+
         $this->aData['surveyid'] = $question->sid;
         $this->aData['sid'] = $question->sid;
         $this->aData['display']['menu_bars']['gid_action'] = 'viewquestion';

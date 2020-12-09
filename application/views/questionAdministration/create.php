@@ -23,167 +23,86 @@ $this->renderPartial(
 }
 </style>
 
-<!-- NB: These must be inside #pjax-content to work with pjax. -->
-<?= $jsVariablesHtml; ?>
-<?= $modalsHtml; ?>
-
 <!-- Create form for question -->
 <div class="side-body">
 
-    <!-- Question overview switch (no summary on create, so hide then) -->
-    <?php if ($question->qid !== 0): ?>
-        <div
-            class="btn-group pull-right clear"
-            role="group"
-            data-toggle="buttons"
-        >
-            <?php
-            if ($this->aData['tabOverviewEditor'] === 'overview') {
-                $activeOverview = 'active';
-                $activeEditor = '';
-                $visibilityOverview = ''; //should be displayed
-                $visibilityEditor = 'style="display:none;"';
-            } else {
-                $activeOverview = '';
-                $activeEditor = 'active';
-                $visibilityOverview = 'style="display:none;"';
-                $visibilityEditor = ''; //should be displayed
-            }
-            ?>
-            <label class="btn btn-default <?= $activeOverview?>" onclick="LS.questionEditor.showOverview();">
-                <input 
-                    type="radio" 
-                    name="question-overview-switch"
-                    checked="checked"
-                />
-                <?= gt('Question overview'); ?>
-            </label>
-            <label class="btn btn-default <?= $activeEditor?>" onclick="LS.questionEditor.showEditor();">
-                <input
-                    type="radio"
-                    name="question-overview-switch"
-                />
-                <?= gT('Question editor'); ?>
-            </label>
-        </div>
-    <?php endif; ?>
+    <!-- Test modal as Vue app -->
+    <div id="save-as-label-set-vue-component" class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span >&times;</span></button>
+                <h4 class="modal-title">
+                    {{ l10n.saveAsLabelSet }}
+                </h4>
 
-    <div class="container-fluid">
-        <?php echo CHtml::form(
-            ['questionAdministration/saveQuestionData'],
-            'post',
-            ['id' => 'edit-question-form']
-        ); ?>
-
-            <input type="hidden" name="sid" value="<?= $oSurvey->sid; ?>" />
-            <input type="hidden" name="question[qid]" value="<?= $question->qid; ?>" />
-            <input type="hidden" name="tabOverviewEditor" id='tab-overview-editor-input' value="<?=$this->aData['tabOverviewEditor']?>" />
-            <?php /** this btn is trigger by save&close topbar button in copyQuestiontobar_view  */ ?>
-            <input
-                type='submit'
-                style="display:none"
-                class="btn navbar-btn button white btn-success"
-                id = 'submit-create-question'
-                name="savecreate"
-            />
-            <div id="advanced-question-editor" <?= $visibilityEditor?>>
-                <div class="container-center scoped-new-questioneditor">
-                    <div class="pagetitle h3 scoped-unset-pointer-events">
-                        <x-test id="action::addQuestion"></x-test>
-                        <?php if ($question->qid === 0): ?>
-                            <?= gT('Create question'); ?>
-                        <?php else: ?>
-                            <?= gT('Edit question'); ?>
-                        <?php endif; ?>
-                    </div>
-
-                    <!-- Question code and question type selector -->
-                    <div class="row">
-                        <?php $this->renderPartial(
-                            "codeAndType",
-                            [
-                                'oSurvey'             => $oSurvey,
-                                'question'            => $question,
-                                'aStructureArray'     => $aQuestionTypeGroups,
-                                'questionTypes'       => $aQuestionTypeStateList,
-                                'aQuestionTypeGroups' => $aQuestionTypeGroups
-                            ]
-                        ); ?>
-                    </div>
-
-                    <!-- Language selector -->
-                    <div class="row">
-                        <?php $this->renderPartial(
-                            "languageselector",
-                            ['oSurvey' => $oSurvey]
-                        ); ?>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-lg-7">
-                            <!-- Text elements -->
-                            <?php $this->renderPartial(
-                                "textElements",
-                                [
-                                    'oSurvey'         => $oSurvey,
-                                    'question'        => $question,
-                                    'aStructureArray' => $aQuestionTypeGroups,
-                                    'questionTypes'   => $aQuestionTypeStateList,
-                                ]
-                            ); ?>
-                        </div>
-
-                        <!-- General settings -->
-                        <div class="col-lg-5">
-                            <div class="ls-flex scope-set-min-height scoped-general-settings">
-                                <?php $this->renderPartial("generalSettings", ['generalSettings'  => $generalSettings]); ?>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="ls-flex ls-flex-row scoped-advanced-settings-block">
-                        <?php $this->renderPartial(
-                            "advancedSettings",
-                            [
-                                'question'        => $question,
-                                'oSurvey'          => $oSurvey,
-                                'advancedSettings' => $advancedSettings,
-                            ]
-                        ); ?>
-                    </div>
-
-                </div>
             </div>
-        </form>
+
+            <div class="modal-body">
+                <p>
+                    <input type="radio" name="savelabeloption" id="newlabel" value="new" v-model="newOrReplace">
+                    <label for="newlabel">{{ l10n.newLabelSet }}</label>
+                </p>
+                <p>
+                    <input type="radio" name="savelabeloption" id="replacelabel" value="replace" v-model="newOrReplace">
+                    <label for="replacelabel">{{ l10n.replaceExistingRecord }}</label>
+                </p>
+            </div>
+
+            <!-- "New" input -->
+            <div v-if="newOrReplace === 'new'">
+                <p id="lasets" class="label-name-wrapper">
+                    <label for="laname">{{ l10n.labelSetNameInput }}</label>
+                    <input type="text" name="laname" id="laname">
+                 </p>
+            </div>
+            <!-- "Replace" input -->
+            <div v-if="newOrReplace === 'replace'">
+                <p id="laname" class="label-name-wrapper">
+                    <replace-input />
+                </p>
+            </div>
+
+            <div class="modal-footer button-list">
+                <button id='btnsavelabelset' class='btn btn-default' type='button'>{{ l10n.save }}</button>
+                <button class='btn btn-warning' id='btnlacancel' type='button'  data-dismiss="modal">{{ l10n.cancel }}</button>
+            </div>
+        </div>
     </div>
-
-    <!-- Show summary page if we're editing or viewing. -->
-    <?php if ($question->qid !== 0): ?>
-        <div class="container-fluid" id="question-overview" <?= $visibilityOverview?>>
-            <form>
-            <!-- Question summary -->
-            <div class="container-center scoped-new-questioneditor">
-                <div class="pagetitle h3" style="padding-top: 0; margin-top: 0;">
-                    <?php eT('Question summary'); ?>&nbsp;
-                    <small>
-                        <em><?= $question->title; ?></em>&nbsp;
-                        (ID: <?php echo (int) $question->qid;?>)
-                    </small>
-                </div>
-                <div class="row">
-                    <?php $this->renderPartial(
-                        "summary",
-                        [
-                            'question'         => $question,
-                            'questionTypes'     => $aQuestionTypeStateList,
-                            'answersCount'      => count($question->answers),
-                            'subquestionsCount' => count($question->subquestions),
-                            'advancedSettings'  => $advancedSettings
-                        ]
-                    ); ?>
-                </div>
-            </div>
-            </form>
-        </div>
-    <?php endif; ?>
+    <script>
+        // Register component replace-input globally.
+        // Can also be imported as a module.
+        Vue.component('replace-input', {
+            data: () => {
+                return {
+                    options: []
+                };
+            },
+            template: `
+                <select name="laname">
+                    <option value=""></option>
+                    <option v-for="(option, index) in this.options" value="index">
+                        {{ option }}
+                    </option>
+                </select>
+            `,
+            created: async function() {
+                const url = '<?= Yii::app()->createUrl("/admin/labels/sa/getAllSets"); ?>';
+                this.options = await $.getJSON(url);
+            }
+        });
+        const app = new Vue({
+            el: '#save-as-label-set-vue-component',
+            data: {
+                newOrReplace: null,
+                l10n: {
+                    saveAsLabelSet: '<?= gT("Save as label set"); ?>',
+                    labelSetNameInput: 'Label set name:',
+                    newLabelSet: '<?= gT("New label set"); ?>',
+                    replaceExistingRecord: '<?= gT("Replace the existing record"); ?>',
+                    save: '<?= gT("Save"); ?>',
+                    cancel: '<?= gT("Cancel"); ?>',
+                }
+            }
+        })
+    </script>
 </div>
