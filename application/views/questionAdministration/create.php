@@ -92,6 +92,7 @@ $this->renderPartial(
                 this.options = await $.getJSON(url);
             }
         });
+        // It's possible to have multiple apps on one page.
         const app = new Vue({
             el: '#save-as-label-set-vue-app',
             data: {
