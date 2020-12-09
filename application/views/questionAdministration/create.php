@@ -27,7 +27,7 @@ $this->renderPartial(
 <div class="side-body">
 
     <!-- Test modal as Vue app -->
-    <div id="save-as-label-set-vue-component" class="modal-dialog" role="document">
+    <div id="save-as-label-set-vue-app" class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span >&times;</span></button>
@@ -93,7 +93,7 @@ $this->renderPartial(
             }
         });
         const app = new Vue({
-            el: '#save-as-label-set-vue-component',
+            el: '#save-as-label-set-vue-app',
             data: {
                 newOrReplace: null,
                 l10n: {
