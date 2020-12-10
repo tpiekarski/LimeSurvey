@@ -157,6 +157,20 @@ class QuestionAdministrationController extends LSBaseController
             CClientScript::POS_HEAD
         );
 
+        // Register CDN version of React.
+        Yii::app()->clientScript->registerScriptFile(
+            'https://unpkg.com/react@17/umd/react.development.js',
+            CClientScript::POS_HEAD
+        );
+        Yii::app()->clientScript->registerScriptFile(
+            'https://unpkg.com/react-dom@17/umd/react-dom.development.js',
+            CClientScript::POS_HEAD
+        );
+        Yii::app()->clientScript->registerScriptFile(
+            'https://unpkg.com/babel-standalone@6/babel.min.js',
+            CClientScript::POS_HEAD
+        );
+
         $this->aData['surveyid'] = $question->sid;
         $this->aData['sid'] = $question->sid;
         $this->aData['display']['menu_bars']['gid_action'] = 'viewquestion';
