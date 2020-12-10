@@ -130,7 +130,6 @@ $this->renderPartial(
             async componentDidMount() {
                 const url = '<?= Yii::app()->createUrl("/admin/labels/sa/getAllSets"); ?>';
                 const options = await $.getJSON(url);
-                console.log('await options', this.state.options);
                 this.setState({options});
             }
 
@@ -138,11 +137,12 @@ $this->renderPartial(
                 if (this.state.options === null) {
                     return <p>Loading...</p>;
                 } else {
-                    console.log('render options', this.state.options);
                     return (
                         <select name="laname-react">
                             <option value=""></option>
-                            {Object.entries(this.state.options).map((item) => <option value={item[0]}>{item[1]}</option>)}
+                            {Object.entries(this.state.options).map(
+                                (item) => <option key={item[0]} value={item[0]}>{item[1]}</option>
+                            )}
                         </select>
                     );
                 }
