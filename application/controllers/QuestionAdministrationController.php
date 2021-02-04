@@ -244,7 +244,7 @@ class QuestionAdministrationController extends LSBaseController
         ];
 
         var_dump($questionTemplate);
-        var_dump($viewData);
+        var_dump($viewData['aQuestionTypeGroups']);
         die();
         if ($questionTemplate === '5PointChoice') {
             // View ViewData.
