@@ -110,7 +110,7 @@ class QuestionAdministrationController extends LSBaseController
     /**
      * Show question edit form.
      *
-     * @param int $questionId
+     * @param int    $questionId        Question ID
      * @param string $tabOverviewEditor which tab should be used this can be 'overview' or 'editor'
      * @return void
      * @throws CHttpException
@@ -150,7 +150,7 @@ class QuestionAdministrationController extends LSBaseController
      * Helper function to render form.
      * Used by create and edit actions.
      *
-     * @param Question $question
+     * @param Question $question Question
      * @return void
      * @throws CException
      * @todo Move to service class
@@ -219,7 +219,6 @@ class QuestionAdministrationController extends LSBaseController
         $this->aData['showSaveAndCloseButton'] = true;
         $this->aData['showCloseButton'] = true;
 
-        //$this->aData['topBar']['leftSideView'] = 'questionTopbarLeft_view';
         $this->aData['sid'] = $question->sid;
         $this->aData['gid'] = $question->gid;
         $this->aData['qid'] = $question->qid;
@@ -228,7 +227,7 @@ class QuestionAdministrationController extends LSBaseController
 
         $viewData = [
             'oSurvey'                => $question->survey,
-            'oQuestion'               => $question,
+            'oQuestion'              => $question,
             'questionTemplate'       => $questionTemplate,
             'aQuestionTypeGroups'    => $this->getQuestionTypeGroups($this->aData['aQuestionTypeList']),
             'advancedSettings'       => $advancedSettings,
@@ -243,6 +242,15 @@ class QuestionAdministrationController extends LSBaseController
             'jsVariablesHtml'       => $jsVariablesHtml,
             'modalsHtml'            => $modalsHtml
         ];
+
+        if ($questionTemplate === '5PointChoice') {
+            // View ViewData.
+            // TODO: Remove Input Validation from General Settings.
+            var_dump($viewData['generalSettings']);
+
+            // TODO: Remove Other Comment Mandatory from Logic Tab
+            die();
+        }
 
         $this->aData = array_merge($this->aData, $viewData);
 
@@ -2920,6 +2928,7 @@ class QuestionAdministrationController extends LSBaseController
     }
 
     /**
+     * @param array $aQuestionTypeList Question Type List as Array
      * @return array
      */
     private function getQuestionTypeGroups($aQuestionTypeList)
