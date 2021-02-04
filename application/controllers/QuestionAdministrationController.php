@@ -242,7 +242,7 @@ class QuestionAdministrationController extends LSBaseController
             'jsVariablesHtml'       => $jsVariablesHtml,
             'modalsHtml'            => $modalsHtml
         ];
-        print_r($viewData['aQuestionTypeGroups']);
+        print_r($viewData['aQuestionTypeGroups']['single_choice_questions']);
         die();
         if ($questionTemplate === '5PointChoice') {
             // View ViewData.
