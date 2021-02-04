@@ -243,6 +243,8 @@ class QuestionAdministrationController extends LSBaseController
             'modalsHtml'            => $modalsHtml
         ];
 
+        var_dump($questionTemplate);
+        die();
         if ($questionTemplate === '5PointChoice') {
             // View ViewData.
             // TODO: Remove Input Validation from General Settings.
